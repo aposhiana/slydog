@@ -28,6 +28,38 @@ canvas.addEventListener('click', () => {
 canvas.setAttribute('tabindex', '0');
 canvas.focus();
 
+// Simple text input buffer for dialogue
+let textInputBuffer = '';
+let isDialogueInputActive = false;
+
+// Direct text input handler for dialogue
+document.addEventListener('keydown', (e) => {
+  if (isDialogueInputActive && GameState.isInDialogue) {
+    if (e.key === 'Enter') {
+      console.log('ENTER PRESSED - SUBMITTING:', textInputBuffer);
+      if (textInputBuffer.trim()) {
+        dialogueSystem.handleInput('Enter');
+        // Submit the text
+        if (dialogueSystem.currentNPC) {
+          dialogueSystem.currentNPC.continueDialogue(textInputBuffer.trim()).then(response => {
+            dialogueSystem.continueDialogue(response);
+          });
+        }
+      }
+      textInputBuffer = '';
+      e.preventDefault();
+    } else if (e.key === 'Backspace') {
+      textInputBuffer = textInputBuffer.slice(0, -1);
+      console.log('BACKSPACE - BUFFER:', textInputBuffer);
+      e.preventDefault();
+    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+      textInputBuffer += e.key;
+      console.log('CHARACTER ADDED - BUFFER:', textInputBuffer);
+      e.preventDefault();
+    }
+  }
+});
+
 // Game state
 let gameRunning = true;
 
@@ -44,26 +76,20 @@ function update(dt) {
   // Handle input based on game state
   if (GameState.isInDialogue) {
     // Enable text input mode
-    input.setTextInputMode(true);
+    isDialogueInputActive = true;
     
     // Handle dialogue input
     if (input.isKeyPressed('Escape')) {
       dialogueSystem.endDialogue();
       GameState.isInDialogue = false;
       GameState.currentNPC = null;
-      input.setTextInputMode(false);
-    }
-    
-    // Handle text input for dialogue
-    const textInput = input.getTextInputEvent();
-    if (textInput) {
-      console.log('TEXT INPUT DETECTED:', textInput);
-      dialogueSystem.handleInput(textInput);
+      isDialogueInputActive = false;
+      textInputBuffer = '';
     }
     
   } else {
     // Disable text input mode
-    input.setTextInputMode(false);
+    isDialogueInputActive = false;
     // Handle movement input - check for newly pressed keys
     let dx = 0, dy = 0;
     
@@ -100,6 +126,11 @@ function update(dt) {
   // Update dialogue system
   dialogueSystem.update(dt);
   
+  // Sync text input buffer with dialogue system
+  if (isDialogueInputActive && GameState.isInDialogue) {
+    dialogueSystem.setPlayerInput(textInputBuffer);
+  }
+  
   // Update input system last (clears pressed/released states)
   input.update();
   
@@ -118,8 +149,8 @@ function render() {
 
 // Initialize and start the game
 function init() {
-  console.log('🚂 TRAIN MYSTERY GAME - VERSION 999 LOADED! 🚂');
-  console.log('🚂 TEXT INPUT FIX APPLIED! 🚂');
+  console.log('🚂 TRAIN MYSTERY GAME - VERSION 1001 LOADED! 🚂');
+  console.log('🚂 NEW FILENAME - TEXT INPUT FIX APPLIED! 🚂');
   console.log('Initializing Train Mystery Game...');
   console.log('Controls: WASD or Arrow Keys to move');
   console.log('Player starting position:', GameState.playerPos);

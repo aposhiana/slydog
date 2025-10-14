@@ -4,8 +4,8 @@
   "description": "A train mystery game with AI-driven NPCs",
   "main": "index.html",
   "scripts": {
-    "serve": "npx http-server -c-1 -p 8080 .",
-    "dev": "npx http-server -c-1 -p 8080 ."
+    "serve": "npx http-server -c-1 -p 8080 --no-cors --no-dotfiles --no-etag .",
+    "dev": "npx http-server -c-1 -p 8080 --no-cors --no-dotfiles --no-etag ."
   },
   "keywords": ["game", "mystery", "canvas", "ai"],
   "author": "",

@@ -39,7 +39,6 @@ export class DialogueSystem {
     this.lastTypeTime = 0;
     this.playerInput = '';
     this.showInput = false;
-    console.log(`Started dialogue with ${npc.name}: ${initialText}`);
   }
 
   // Continue dialogue with new text
@@ -106,6 +105,11 @@ export class DialogueSystem {
     } else if (char.length === 1 && this.playerInput.length < 100) {
       this.playerInput += char;
     }
+  }
+
+  // Set player input from external buffer
+  setPlayerInput(text) {
+    this.playerInput = text;
   }
 
   // Submit player input

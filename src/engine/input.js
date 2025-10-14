@@ -13,14 +13,10 @@ class InputManager {
 
   setupEventListeners() {
     document.addEventListener('keydown', (e) => {
-      // Debug: Log all key presses
-      console.log('Key pressed:', e.code, e.key);
-      
       // Prevent default browser behavior for game keys
       const gameKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyE', 'Escape'];
       if (gameKeys.includes(e.code)) {
         e.preventDefault();
-        console.log('Game key detected, preventing default');
       }
       
       if (!this.keys.has(e.code)) {
@@ -142,7 +138,9 @@ class InputManager {
   // Get the latest text input event
   getTextInputEvent() {
     const event = this.textInputEvent;
-    this.textInputEvent = null;
+    if (event) {
+      this.textInputEvent = null; // Only clear after successful retrieval
+    }
     return event;
   }
 
