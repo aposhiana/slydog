@@ -1,11 +1,23 @@
 import { TILE_TYPES, GRID_W, GRID_H } from '../shared/constants.js';
 import { NPC } from './npc.js';
+import { LEVEL_1_CLUES, LEVEL_1_REQUIRED_CLUES, LEVEL_1_NPC_CLUES, validateClueGraph } from './clue_graph.js';
+import { checkLevelComplete } from './game_state.js';
 
 // World class manages the tilemap, collision detection, and NPCs
 export class World {
   constructor() {
     this.tilemap = this.generatePlaceholderTilemap();
+    
+    // Initialize clue system first
+    this.clues = LEVEL_1_CLUES;
+    this.requiredClues = LEVEL_1_REQUIRED_CLUES;
+    this.npcClues = LEVEL_1_NPC_CLUES;
+    
+    // Then generate NPCs (which now have access to clue mappings)
     this.npcs = this.generatePlaceholderNPCs();
+    
+    // Validate clue graph on load
+    this.validateClueSystem();
   }
 
   // Generate a simple placeholder tilemap
@@ -72,40 +84,44 @@ export class World {
   generatePlaceholderNPCs() {
     const npcs = [];
     
-    // Conductor NPC
+    // Conductor NPC - provides clue A
     npcs.push(new NPC(
       'conductor',
       3, 3,
       '#ff6b6b', // Red
       'Conductor Smith',
-      'a friendly train conductor who has been working this route for 20 years'
+      'a friendly train conductor who has been working this route for 20 years',
+      this.npcClues.conductor // clue_a
     ));
     
-    // Passenger NPC
+    // Passenger NPC - provides clue B
     npcs.push(new NPC(
       'passenger',
       8, 4,
       '#4ecdc4', // Teal
       'Mrs. Johnson',
-      'an elderly passenger traveling to visit her grandchildren'
+      'an elderly passenger traveling to visit her grandchildren',
+      this.npcClues.passenger // clue_b
     ));
     
-    // Chef NPC
+    // Chef NPC - no clue
     npcs.push(new NPC(
       'chef',
       16, 7,
       '#45b7d1', // Blue
       'Chef Marco',
       'the train\'s head chef who takes great pride in his culinary skills'
+      // No clueId - this NPC doesn't provide clues
     ));
     
-    // Guard NPC
+    // Guard NPC - provides clue C
     npcs.push(new NPC(
       'guard',
       12, 2,
       '#96ceb4', // Green
       'Officer Davis',
-      'a security guard who keeps a watchful eye on the passengers'
+      'a security guard who keeps a watchful eye on the passengers',
+      this.npcClues.guard // clue_c
     ));
     
     return npcs;
@@ -134,5 +150,32 @@ export class World {
     
     // Check if another NPC is already at this position
     return !this.getNPCAt(x, y);
+  }
+
+  // Validate the clue system on initialization
+  validateClueSystem() {
+    const validation = validateClueGraph(this.clues);
+    if (!validation.isValid) {
+      console.error('❌ Clue graph validation failed:');
+      validation.errors.forEach(error => console.error(`  - ${error}`));
+      throw new Error('Invalid clue graph configuration');
+    }
+    console.log('✅ Clue graph validation passed');
+    console.log(`🔍 Loaded ${Object.keys(this.clues).length} clues for level ${this.requiredClues.length} required`);
+  }
+
+  // Get clue data
+  getClues() {
+    return this.clues;
+  }
+
+  // Get required clues for this level
+  getRequiredClues() {
+    return this.requiredClues;
+  }
+
+  // Check if level is complete
+  checkLevelComplete(ownedClues) {
+    return checkLevelComplete(this.requiredClues);
   }
 }

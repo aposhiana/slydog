@@ -172,8 +172,48 @@ export class Renderer {
       dialogueSystem.render();
     }
     
+    // Render victory overlay if level is complete
+    if (gameState.isLevelComplete) {
+      this.renderVictoryOverlay(gameState.victoryMessage);
+    }
+    
     if (showDebug) {
       this.renderDebug(player, world);
     }
+  }
+
+  // Render victory overlay
+  renderVictoryOverlay(message) {
+    // Semi-transparent overlay
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    this.ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    
+    // Victory message background
+    const centerX = CANVAS_WIDTH / 2;
+    const centerY = CANVAS_HEIGHT / 2;
+    const boxWidth = 400;
+    const boxHeight = 200;
+    
+    this.ctx.fillStyle = '#2a4d3a';
+    this.ctx.fillRect(centerX - boxWidth/2, centerY - boxHeight/2, boxWidth, boxHeight);
+    
+    // Border
+    this.ctx.strokeStyle = '#4a9eff';
+    this.ctx.lineWidth = 3;
+    this.ctx.strokeRect(centerX - boxWidth/2, centerY - boxHeight/2, boxWidth, boxHeight);
+    
+    // Victory text
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.font = 'bold 32px monospace';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText(message, centerX, centerY - 20);
+    
+    // Subtitle
+    this.ctx.font = '16px monospace';
+    this.ctx.fillStyle = '#cccccc';
+    this.ctx.fillText('Press R to restart', centerX, centerY + 20);
+    
+    // Reset text alignment
+    this.ctx.textAlign = 'left';
   }
 }

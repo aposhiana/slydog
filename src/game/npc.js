@@ -2,7 +2,7 @@ import { TILE_SIZE } from '../shared/constants.js';
 
 // NPC class for non-player characters
 export class NPC {
-  constructor(id, x, y, color, name, persona) {
+  constructor(id, x, y, color, name, persona, clueId = null) {
     this.id = id;
     this.gridX = x;
     this.gridY = y;
@@ -14,6 +14,9 @@ export class NPC {
     this.name = name;
     this.persona = persona;
     this.size = TILE_SIZE * 0.6; // Slightly smaller than player
+    
+    // Clue system
+    this.clueId = clueId; // Optional clue this NPC can provide
     
     // Dialogue state
     this.currentDialogue = '';
@@ -102,5 +105,49 @@ export class NPC {
   endDialogue() {
     this.isTalking = false;
     this.currentDialogue = '';
+  }
+
+  // Check if this NPC can provide a clue
+  hasClue() {
+    return this.clueId !== null;
+  }
+
+  // Get clue hint if dependencies aren't met
+  async getClueHint(clues, ownedClues) {
+    if (!this.clueId) return null;
+    
+    try {
+      const { getClueHint } = await import('./clue_graph.js');
+      return getClueHint(this.clueId, clues, ownedClues);
+    } catch (error) {
+      console.error('Error getting clue hint:', error);
+      return "This clue is not available yet.";
+    }
+  }
+
+  // Check if this NPC can grant their clue
+  async canGrantClue(clues, ownedClues) {
+    if (!this.clueId) return false;
+    
+    try {
+      const { canGrantClue } = await import('./clue_graph.js');
+      return canGrantClue(this.clueId, clues, ownedClues);
+    } catch (error) {
+      console.error('Error checking clue grant:', error);
+      return false;
+    }
+  }
+
+  // Grant this NPC's clue to the player
+  async grantClue(clues) {
+    if (!this.clueId) return false;
+    
+    try {
+      const { grantClue } = await import('./game_state.js');
+      return grantClue(this.clueId, clues);
+    } catch (error) {
+      console.error('Error granting clue:', error);
+      return false;
+    }
   }
 }

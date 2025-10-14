@@ -43,9 +43,49 @@ document.addEventListener('keydown', (e) => {
         
         // Submit the text and get response
         if (dialogueSystem.currentNPC) {
-          dialogueSystem.currentNPC.continueDialogue(message).then(response => {
-            dialogueSystem.continueDialogue(response);
-          });
+          const npc = dialogueSystem.currentNPC;
+          
+          // Check if NPC has a clue to grant
+          if (npc.hasClue()) {
+            npc.canGrantClue(world.getClues(), GameState.ownedClues).then(canGrant => {
+              if (canGrant) {
+                // Grant clue and get special response
+                npc.grantClue(world.getClues()).then(clueGranted => {
+                  if (clueGranted) {
+                    // Check if level is complete
+                    world.checkLevelComplete(GameState.ownedClues);
+                    
+                    // Get clue-specific response
+                    const clue = world.getClues()[npc.clueId];
+                    const clueResponse = `I have something important to tell you: ${clue.description}`;
+                    dialogueSystem.continueDialogue(clueResponse);
+                  } else {
+                    // Normal dialogue
+                    npc.continueDialogue(message).then(response => {
+                      dialogueSystem.continueDialogue(response);
+                    });
+                  }
+                });
+              } else {
+                // Show hint for unavailable clue
+                npc.getClueHint(world.getClues(), GameState.ownedClues).then(hint => {
+                  if (hint) {
+                    dialogueSystem.continueDialogue(hint);
+                  } else {
+                    // Normal dialogue
+                    npc.continueDialogue(message).then(response => {
+                      dialogueSystem.continueDialogue(response);
+                    });
+                  }
+                });
+              }
+            });
+          } else {
+            // Normal dialogue for NPCs without clues
+            npc.continueDialogue(message).then(response => {
+              dialogueSystem.continueDialogue(response);
+            });
+          }
         }
       }
       e.preventDefault();
@@ -64,6 +104,10 @@ document.addEventListener('keydown', (e) => {
       textInputBuffer += e.key;
       e.preventDefault();
     }
+  } else if (e.key === 'KeyR' && GameState.isLevelComplete) {
+    // Restart game when level is complete
+    restartGame();
+    e.preventDefault();
   }
 });
 
@@ -168,6 +212,28 @@ function init() {
   startGameLoop(update, render);
   
   console.log('Game started successfully!');
+}
+
+// Restart game function
+function restartGame() {
+  console.log('🔄 Restarting game...');
+  
+  // Reset game state
+  GameState.ownedClues.clear();
+  GameState.isLevelComplete = false;
+  GameState.victoryMessage = '';
+  GameState.isInDialogue = false;
+  GameState.currentNPC = null;
+  
+  // Reset player position
+  GameState.playerPos.x = 2;
+  GameState.playerPos.y = 2;
+  player.setPosition(GameState.playerPos.x, GameState.playerPos.y);
+  
+  // End any active dialogue
+  dialogueSystem.endDialogue();
+  
+  console.log('✅ Game restarted!');
 }
 
 // Start the game with error handling
