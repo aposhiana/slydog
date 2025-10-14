@@ -21,7 +21,6 @@ const dialogueSystem = new DialogueSystem(canvas);
 // Ensure canvas has focus for keyboard input
 canvas.addEventListener('click', () => {
   canvas.focus();
-  console.log('Canvas clicked, focus set');
 });
 
 // Set tabindex to make canvas focusable
@@ -36,25 +35,25 @@ let isDialogueInputActive = false;
 document.addEventListener('keydown', (e) => {
   if (isDialogueInputActive && GameState.isInDialogue) {
     if (e.key === 'Enter') {
-      console.log('ENTER PRESSED - SUBMITTING:', textInputBuffer);
       if (textInputBuffer.trim()) {
-        dialogueSystem.handleInput('Enter');
-        // Submit the text
+        // Clear the input immediately and disable input display
+        const message = textInputBuffer.trim();
+        textInputBuffer = '';
+        dialogueSystem.hideInput();
+        
+        // Submit the text and get response
         if (dialogueSystem.currentNPC) {
-          dialogueSystem.currentNPC.continueDialogue(textInputBuffer.trim()).then(response => {
+          dialogueSystem.currentNPC.continueDialogue(message).then(response => {
             dialogueSystem.continueDialogue(response);
           });
         }
       }
-      textInputBuffer = '';
       e.preventDefault();
     } else if (e.key === 'Backspace') {
       textInputBuffer = textInputBuffer.slice(0, -1);
-      console.log('BACKSPACE - BUFFER:', textInputBuffer);
       e.preventDefault();
     } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
       textInputBuffer += e.key;
-      console.log('CHARACTER ADDED - BUFFER:', textInputBuffer);
       e.preventDefault();
     }
   }

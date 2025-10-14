@@ -27,6 +27,7 @@ export class DialogueSystem {
     this.showInput = false;
     this.cursorVisible = true;
     this.cursorBlinkTime = 0;
+    this.isWaitingForResponse = false; // Flag to prevent replay during AI response
   }
 
   // Start dialogue with an NPC
@@ -39,6 +40,9 @@ export class DialogueSystem {
     this.lastTypeTime = 0;
     this.playerInput = '';
     this.showInput = false;
+    
+    // Clear any previous dialogue history for clean display
+    this.dialogueHistory = [];
   }
 
   // Continue dialogue with new text
@@ -49,6 +53,7 @@ export class DialogueSystem {
     this.lastTypeTime = 0;
     this.showInput = false;
     this.playerInput = '';
+    this.isWaitingForResponse = false; // Response received, can start typing
   }
 
   // End dialogue
@@ -59,6 +64,7 @@ export class DialogueSystem {
     this.isTyping = false;
     this.showInput = false;
     this.playerInput = '';
+    this.isWaitingForResponse = false;
     console.log('Dialogue ended');
   }
 
@@ -112,6 +118,13 @@ export class DialogueSystem {
     this.playerInput = text;
   }
 
+  // Hide input area immediately
+  hideInput() {
+    this.showInput = false;
+    this.isWaitingForResponse = true;
+    // Don't start typing animation - just wait for response
+  }
+
   // Submit player input
   async submitInput() {
     if (!this.currentNPC || !this.playerInput.trim()) return;
@@ -154,12 +167,19 @@ export class DialogueSystem {
       this.panelY + 20
     );
 
-    // Draw dialogue text with typewriter effect
+    // Draw dialogue text with typewriter effect or waiting message
     this.ctx.fillStyle = '#ffffff';
     this.ctx.font = '14px monospace';
     
-    const displayText = this.currentText.substring(0, this.typewriterIndex);
-    this.wrapText(displayText, this.margin, this.textY, CANVAS_WIDTH - this.margin * 2);
+    if (this.isWaitingForResponse) {
+      // Show waiting message instead of replaying text
+      this.ctx.fillStyle = '#888888';
+      this.ctx.fillText('Waiting for response...', this.margin, this.textY);
+    } else {
+      // Normal typewriter effect
+      const displayText = this.currentText.substring(0, this.typewriterIndex);
+      this.wrapText(displayText, this.margin, this.textY, CANVAS_WIDTH - this.margin * 2);
+    }
 
     // Draw input field if ready
     if (this.showInput) {
