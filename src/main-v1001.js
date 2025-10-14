@@ -52,6 +52,14 @@ document.addEventListener('keydown', (e) => {
     } else if (e.key === 'Backspace') {
       textInputBuffer = textInputBuffer.slice(0, -1);
       e.preventDefault();
+    } else if (e.key === 'ArrowUp' && dialogueSystem.maxScrollOffset > 0) {
+      // Scroll up in dialogue
+      dialogueSystem.scrollOffset = Math.max(0, dialogueSystem.scrollOffset - 20);
+      e.preventDefault();
+    } else if (e.key === 'ArrowDown' && dialogueSystem.maxScrollOffset > 0) {
+      // Scroll down in dialogue
+      dialogueSystem.scrollOffset = Math.min(dialogueSystem.maxScrollOffset, dialogueSystem.scrollOffset + 20);
+      e.preventDefault();
     } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
       textInputBuffer += e.key;
       e.preventDefault();

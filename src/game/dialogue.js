@@ -7,11 +7,11 @@ export class DialogueSystem {
     this.ctx = canvas.getContext('2d');
     
     // Dialogue panel dimensions
-    this.panelHeight = 160; // Increased height for more text
+    this.panelHeight = 200; // Even taller for long responses
     this.panelY = CANVAS_HEIGHT - this.panelHeight;
     this.margin = 20;
     this.textY = this.panelY + 30;
-    this.lineHeight = 18;
+    this.lineHeight = 16; // Slightly smaller line height to fit more text
     
     // Dialogue state
     this.isActive = false;
@@ -28,6 +28,10 @@ export class DialogueSystem {
     this.cursorVisible = true;
     this.cursorBlinkTime = 0;
     this.isWaitingForResponse = false; // Flag to prevent replay during AI response
+    
+    // Scrolling state
+    this.scrollOffset = 0;
+    this.maxScrollOffset = 0;
   }
 
   // Start dialogue with an NPC
@@ -40,6 +44,7 @@ export class DialogueSystem {
     this.lastTypeTime = 0;
     this.playerInput = '';
     this.showInput = false;
+    this.scrollOffset = 0; // Reset scroll position
     
     // Clear any previous dialogue history for clean display
     this.dialogueHistory = [];
@@ -54,6 +59,7 @@ export class DialogueSystem {
     this.showInput = false;
     this.playerInput = '';
     this.isWaitingForResponse = false; // Response received, can start typing
+    this.scrollOffset = 0; // Reset scroll for new response
   }
 
   // End dialogue
@@ -176,9 +182,12 @@ export class DialogueSystem {
       this.ctx.fillStyle = '#888888';
       this.ctx.fillText('Waiting for response...', this.margin, this.textY);
     } else {
-      // Normal typewriter effect
+      // Normal typewriter effect with scrolling
       const displayText = this.currentText.substring(0, this.typewriterIndex);
-      this.wrapText(displayText, this.margin, this.textY, CANVAS_WIDTH - this.margin * 2);
+      // For short text, don't apply scroll offset - start at textY
+      // For long text, apply scroll offset to move content up
+      const startY = this.maxScrollOffset > 0 ? this.textY - this.scrollOffset : this.textY;
+      this.calculateAndDrawText(displayText, this.margin, startY, CANVAS_WIDTH - this.margin * 2);
     }
 
     // Draw input field if ready - position it at the bottom of the panel
@@ -188,18 +197,62 @@ export class DialogueSystem {
       
       this.ctx.fillStyle = '#ffffff';
       const inputText = this.playerInput + (this.cursorVisible ? '_' : '');
-      this.ctx.fillText(inputText, this.margin + 30, this.panelY + this.panelHeight - 20);
+      
+      // Wrap input text if it's too long
+      this.wrapInputText(inputText, this.margin + 30, this.panelY + this.panelHeight - 20, CANVAS_WIDTH - this.margin * 2 - 30);
     }
   }
 
-  // Helper function to wrap text
-  wrapText(text, x, y, maxWidth) {
+  // Calculate text height and draw text with scrolling support
+  calculateAndDrawText(text, x, y, maxWidth) {
     const words = text.split(' ');
     let line = '';
     let currentY = y;
+    let totalHeight = 0;
     
-    // Calculate available space - leave room for input field at bottom
-    const maxY = this.panelY + this.panelHeight - 50; // Leave 50px for input field
+    // Define the bottom boundary to avoid overlapping with input area
+    const bottomBoundary = this.panelY + this.panelHeight - 60; // Leave room for input
+
+    for (let i = 0; i < words.length; i++) {
+      const testLine = line + words[i] + ' ';
+      const metrics = this.ctx.measureText(testLine);
+      
+      if (metrics.width > maxWidth && i > 0) {
+        // Only draw if we're not past the bottom boundary
+        if (currentY <= bottomBoundary) {
+          this.ctx.fillText(line, x, currentY);
+        }
+        line = words[i] + ' ';
+        currentY += this.lineHeight;
+        totalHeight += this.lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    
+    // Always draw the last line if it fits
+    if (currentY <= bottomBoundary) {
+      this.ctx.fillText(line, x, currentY);
+    }
+    totalHeight += this.lineHeight;
+    
+    // Update scroll limits
+    const textAreaHeight = this.panelHeight - 60;
+    this.maxScrollOffset = Math.max(0, totalHeight - textAreaHeight + 40);
+    
+    // Auto-scroll to bottom when text is complete
+    if (this.isTyping && this.typewriterIndex >= this.currentText.length) {
+      this.scrollOffset = this.maxScrollOffset;
+    }
+    
+    return currentY;
+  }
+
+  // Helper function to wrap input text
+  wrapInputText(text, x, y, maxWidth) {
+    const words = text.split(' ');
+    let line = '';
+    let currentY = y;
 
     for (let i = 0; i < words.length; i++) {
       const testLine = line + words[i] + ' ';
@@ -209,22 +262,18 @@ export class DialogueSystem {
         this.ctx.fillText(line, x, currentY);
         line = words[i] + ' ';
         currentY += this.lineHeight;
-        
-        // Stop drawing if we've reached the input area
-        if (currentY > maxY) {
-          // Draw "..." to indicate more text
-          this.ctx.fillText('...', x, currentY - this.lineHeight);
-          break;
-        }
       } else {
         line = testLine;
       }
     }
     
-    // Only draw the last line if it fits
-    if (currentY <= maxY) {
-      this.ctx.fillText(line, x, currentY);
-    }
+    // Always draw the last line
+    this.ctx.fillText(line, x, currentY);
+  }
+
+  // Helper function to wrap text and return the final Y position
+  wrapText(text, x, y, maxWidth) {
+    return this.calculateAndDrawText(text, x, y, maxWidth);
   }
 
   // Check if dialogue is active
