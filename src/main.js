@@ -33,6 +33,14 @@ let isDialogueInputActive = false;
 
 // Direct text input handler for dialogue
 document.addEventListener('keydown', (e) => {
+  // Handle restart key when level is complete (highest priority)
+  if (e.key === 'r' && GameState.isLevelComplete) {
+    console.log('🔄 Restart key pressed!');
+    restartGame();
+    e.preventDefault();
+    return;
+  }
+  
   if (isDialogueInputActive && GameState.isInDialogue) {
     if (e.key === 'Enter') {
       if (textInputBuffer.trim()) {
@@ -104,10 +112,16 @@ document.addEventListener('keydown', (e) => {
       textInputBuffer += e.key;
       e.preventDefault();
     }
-  } else if (e.key === 'KeyR' && GameState.isLevelComplete) {
-    // Restart game when level is complete
+  }
+});
+
+// Global restart handler (separate from dialogue system)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'r' && GameState.isLevelComplete) {
+    console.log('🔄 Global restart key pressed!');
     restartGame();
     e.preventDefault();
+    return false;
   }
 });
 
@@ -232,6 +246,10 @@ function restartGame() {
   
   // End any active dialogue
   dialogueSystem.endDialogue();
+  
+  // Clear text input buffer
+  textInputBuffer = '';
+  isDialogueInputActive = false;
   
   console.log('✅ Game restarted!');
 }
