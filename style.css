@@ -1,0 +1,36 @@
+body {
+  margin: 0;
+  padding: 20px;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: monospace;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h1 {
+  color: #4a9eff;
+  margin-bottom: 20px;
+}
+
+#gameCanvas {
+  border: 2px solid #333;
+  background: #000;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.controls {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.controls p {
+  margin: 5px 0;
+}

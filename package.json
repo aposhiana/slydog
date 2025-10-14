@@ -1,13 +1,14 @@
 {
-  "name": "slydog",
+  "name": "slydog-train-mystery",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A train mystery game with AI-driven NPCs",
+  "main": "index.html",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serve": "npx http-server -c-1 -p 8080 .",
+    "dev": "npx http-server -c-1 -p 8080 ."
   },
-  "keywords": [],
+  "keywords": ["game", "mystery", "canvas", "ai"],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "license": "MIT",
+  "type": "module"
 }
