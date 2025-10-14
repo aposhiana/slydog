@@ -7,7 +7,7 @@ export class DialogueSystem {
     this.ctx = canvas.getContext('2d');
     
     // Dialogue panel dimensions
-    this.panelHeight = 120;
+    this.panelHeight = 160; // Increased height for more text
     this.panelY = CANVAS_HEIGHT - this.panelHeight;
     this.margin = 20;
     this.textY = this.panelY + 30;
@@ -181,14 +181,14 @@ export class DialogueSystem {
       this.wrapText(displayText, this.margin, this.textY, CANVAS_WIDTH - this.margin * 2);
     }
 
-    // Draw input field if ready
+    // Draw input field if ready - position it at the bottom of the panel
     if (this.showInput) {
       this.ctx.fillStyle = '#666666';
-      this.ctx.fillText('You: ', this.margin, this.textY + 40);
+      this.ctx.fillText('You: ', this.margin, this.panelY + this.panelHeight - 20);
       
       this.ctx.fillStyle = '#ffffff';
       const inputText = this.playerInput + (this.cursorVisible ? '_' : '');
-      this.ctx.fillText(inputText, this.margin + 30, this.textY + 40);
+      this.ctx.fillText(inputText, this.margin + 30, this.panelY + this.panelHeight - 20);
     }
   }
 
@@ -197,6 +197,9 @@ export class DialogueSystem {
     const words = text.split(' ');
     let line = '';
     let currentY = y;
+    
+    // Calculate available space - leave room for input field at bottom
+    const maxY = this.panelY + this.panelHeight - 50; // Leave 50px for input field
 
     for (let i = 0; i < words.length; i++) {
       const testLine = line + words[i] + ' ';
@@ -206,12 +209,22 @@ export class DialogueSystem {
         this.ctx.fillText(line, x, currentY);
         line = words[i] + ' ';
         currentY += this.lineHeight;
+        
+        // Stop drawing if we've reached the input area
+        if (currentY > maxY) {
+          // Draw "..." to indicate more text
+          this.ctx.fillText('...', x, currentY - this.lineHeight);
+          break;
+        }
       } else {
         line = testLine;
       }
     }
     
-    this.ctx.fillText(line, x, currentY);
+    // Only draw the last line if it fits
+    if (currentY <= maxY) {
+      this.ctx.fillText(line, x, currentY);
+    }
   }
 
   // Check if dialogue is active
