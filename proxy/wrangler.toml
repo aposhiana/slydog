@@ -1,0 +1,5 @@
+name = "train-mystery-proxy"
+main = "worker.js"
+compatibility_date = "2025-10-14"
+workers_dev = true
+preview_urls = true
