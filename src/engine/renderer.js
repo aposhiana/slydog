@@ -90,6 +90,60 @@ export class Renderer {
     this.ctx.stroke();
   }
 
+  // Render NPCs
+  renderNPCs(npcs) {
+    npcs.forEach(npc => {
+      const pos = npc.getPosition();
+      const screenX = pos.x - this.cameraX;
+      const screenY = pos.y - this.cameraY;
+      
+      // Draw NPC as a colored square
+      this.ctx.fillStyle = npc.color;
+      this.ctx.fillRect(
+        screenX + TILE_SIZE * 0.2, 
+        screenY + TILE_SIZE * 0.2, 
+        TILE_SIZE * 0.6, 
+        TILE_SIZE * 0.6
+      );
+      
+      // Draw NPC border
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.lineWidth = 2;
+      this.ctx.strokeRect(
+        screenX + TILE_SIZE * 0.2, 
+        screenY + TILE_SIZE * 0.2, 
+        TILE_SIZE * 0.6, 
+        TILE_SIZE * 0.6
+      );
+      
+      // Draw NPC name above them
+      this.ctx.fillStyle = npc.color;
+      this.ctx.font = '10px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(
+        npc.name, 
+        screenX + TILE_SIZE / 2, 
+        screenY - 5
+      );
+      this.ctx.textAlign = 'left'; // Reset alignment
+    });
+  }
+
+  // Render interaction indicator
+  renderInteractionIndicator(canInteract) {
+    if (canInteract) {
+      this.ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
+      this.ctx.font = 'bold 12px monospace';
+      this.ctx.textAlign = 'center';
+      this.ctx.fillText(
+        'Press E to talk', 
+        CANVAS_WIDTH / 2, 
+        30
+      );
+      this.ctx.textAlign = 'left'; // Reset alignment
+    }
+  }
+
   // Render debug information
   renderDebug(player, world) {
     this.ctx.fillStyle = '#ffffff';
@@ -105,11 +159,18 @@ export class Renderer {
   }
 
   // Main render function
-  render(world, player, showDebug = true) {
+  render(world, player, dialogueSystem, gameState, showDebug = true) {
     this.clear();
     this.updateCamera(player.pixelX, player.pixelY);
     this.renderWorld(world);
+    this.renderNPCs(world.getNPCs());
     this.renderPlayer(player);
+    this.renderInteractionIndicator(gameState.canInteract && !gameState.isInDialogue);
+    
+    // Render dialogue panel if active
+    if (dialogueSystem && dialogueSystem.isDialogueActive()) {
+      dialogueSystem.render();
+    }
     
     if (showDebug) {
       this.renderDebug(player, world);

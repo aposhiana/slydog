@@ -1,9 +1,11 @@
 import { TILE_TYPES, GRID_W, GRID_H } from '../shared/constants.js';
+import { NPC } from './npc.js';
 
-// World class manages the tilemap and collision detection
+// World class manages the tilemap, collision detection, and NPCs
 export class World {
   constructor() {
     this.tilemap = this.generatePlaceholderTilemap();
+    this.npcs = this.generatePlaceholderNPCs();
   }
 
   // Generate a simple placeholder tilemap
@@ -64,5 +66,73 @@ export class World {
   // Get the tilemap for rendering
   getTilemap() {
     return this.tilemap;
+  }
+
+  // Generate placeholder NPCs for testing
+  generatePlaceholderNPCs() {
+    const npcs = [];
+    
+    // Conductor NPC
+    npcs.push(new NPC(
+      'conductor',
+      3, 3,
+      '#ff6b6b', // Red
+      'Conductor Smith',
+      'a friendly train conductor who has been working this route for 20 years'
+    ));
+    
+    // Passenger NPC
+    npcs.push(new NPC(
+      'passenger',
+      8, 4,
+      '#4ecdc4', // Teal
+      'Mrs. Johnson',
+      'an elderly passenger traveling to visit her grandchildren'
+    ));
+    
+    // Chef NPC
+    npcs.push(new NPC(
+      'chef',
+      16, 7,
+      '#45b7d1', // Blue
+      'Chef Marco',
+      'the train\'s head chef who takes great pride in his culinary skills'
+    ));
+    
+    // Guard NPC
+    npcs.push(new NPC(
+      'guard',
+      12, 2,
+      '#96ceb4', // Green
+      'Officer Davis',
+      'a security guard who keeps a watchful eye on the passengers'
+    ));
+    
+    return npcs;
+  }
+
+  // Get all NPCs
+  getNPCs() {
+    return this.npcs;
+  }
+
+  // Find NPC at a specific grid position
+  getNPCAt(x, y) {
+    return this.npcs.find(npc => npc.gridX === x && npc.gridY === y);
+  }
+
+  // Find NPCs adjacent to a position
+  getAdjacentNPCs(x, y) {
+    return this.npcs.filter(npc => npc.isAdjacentTo(x, y));
+  }
+
+  // Check if a position is valid for NPCs (not occupied by wall or another NPC)
+  isValidNPCPosition(x, y) {
+    if (!this.isValidPosition(x, y)) {
+      return false;
+    }
+    
+    // Check if another NPC is already at this position
+    return !this.getNPCAt(x, y);
   }
 }

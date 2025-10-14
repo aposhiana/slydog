@@ -4,19 +4,52 @@ class InputManager {
     this.keys = new Set();
     this.pressed = new Set();
     this.released = new Set();
+    this.textBuffer = '';
+    this.isTextInputMode = false;
+    this.textInputEvent = null;
     
     this.setupEventListeners();
   }
 
   setupEventListeners() {
     document.addEventListener('keydown', (e) => {
+      // Debug: Log all key presses
+      console.log('Key pressed:', e.code, e.key);
+      
+      // Prevent default browser behavior for game keys
+      const gameKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyE', 'Escape'];
+      if (gameKeys.includes(e.code)) {
+        e.preventDefault();
+        console.log('Game key detected, preventing default');
+      }
+      
       if (!this.keys.has(e.code)) {
         this.keys.add(e.code);
         this.pressed.add(e.code);
       }
+      
+      // Handle text input for dialogue
+      if (this.isTextInputMode) {
+        if (e.key === 'Enter') {
+          this.textInputEvent = 'Enter';
+          e.preventDefault();
+        } else if (e.key === 'Backspace') {
+          this.textInputEvent = 'Backspace';
+          e.preventDefault();
+        } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+          this.textInputEvent = e.key;
+          e.preventDefault();
+        }
+      }
     });
 
     document.addEventListener('keyup', (e) => {
+      // Prevent default browser behavior for game keys
+      const gameKeys = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyE', 'Escape'];
+      if (gameKeys.includes(e.code)) {
+        e.preventDefault();
+      }
+      
       this.keys.delete(e.code);
       this.released.add(e.code);
     });
@@ -70,15 +103,47 @@ class InputManager {
     // Check for pressed keys (one-time events)
     if (this.isKeyPressed('KeyW') || this.isKeyPressed('ArrowUp')) {
       dy = -1;
+      console.log('Movement: UP');
     } else if (this.isKeyPressed('KeyS') || this.isKeyPressed('ArrowDown')) {
       dy = 1;
+      console.log('Movement: DOWN');
     } else if (this.isKeyPressed('KeyA') || this.isKeyPressed('ArrowLeft')) {
       dx = -1;
+      console.log('Movement: LEFT');
     } else if (this.isKeyPressed('KeyD') || this.isKeyPressed('ArrowRight')) {
       dx = 1;
+      console.log('Movement: RIGHT');
     }
 
     return { dx, dy };
+  }
+
+  // Check if interaction key (E) is pressed
+  isInteractionPressed() {
+    return this.isKeyPressed('KeyE');
+  }
+
+  // Get text input (for dialogue)
+  getTextInput() {
+    return this.textBuffer;
+  }
+
+  // Clear text input buffer
+  clearTextInput() {
+    this.textBuffer = '';
+  }
+
+  // Enable/disable text input mode
+  setTextInputMode(enabled) {
+    this.isTextInputMode = enabled;
+    this.textInputEvent = null;
+  }
+
+  // Get the latest text input event
+  getTextInputEvent() {
+    const event = this.textInputEvent;
+    this.textInputEvent = null;
+    return event;
   }
 
   // Clear pressed/released states (call at end of frame)

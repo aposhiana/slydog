@@ -4,6 +4,7 @@ import { Renderer } from './engine/renderer.js';
 import { World } from './game/world.js';
 import { Player } from './game/player.js';
 import { GameState } from './game/game_state.js';
+import { DialogueSystem } from './game/dialogue.js';
 
 // Get canvas element
 const canvas = document.getElementById('gameCanvas');
@@ -15,6 +16,17 @@ if (!canvas) {
 const world = new World();
 const player = new Player(GameState.playerPos.x, GameState.playerPos.y);
 const renderer = new Renderer(canvas);
+const dialogueSystem = new DialogueSystem(canvas);
+
+// Ensure canvas has focus for keyboard input
+canvas.addEventListener('click', () => {
+  canvas.focus();
+  console.log('Canvas clicked, focus set');
+});
+
+// Set tabindex to make canvas focusable
+canvas.setAttribute('tabindex', '0');
+canvas.focus();
 
 // Game state
 let gameRunning = true;
@@ -23,16 +35,82 @@ let gameRunning = true;
 function update(dt) {
   if (!gameRunning) return;
   
-  // Handle input
-  const movement = input.getMovementPress();
-  if (movement.dx !== 0 || movement.dy !== 0) {
-    player.tryMove(movement.dx, movement.dy, world);
+  // Debug: Check if update is being called
+  if (Math.random() < 0.01) { // Log occasionally to avoid spam
+    console.log('Game loop running, dt:', dt);
+  }
+  
+  // Check for nearby NPCs and interaction
+  const playerGridPos = player.getGridPosition();
+  const nearbyNPCs = world.getAdjacentNPCs(playerGridPos.x, playerGridPos.y);
+  GameState.nearbyNPCs = nearbyNPCs;
+  GameState.canInteract = nearbyNPCs.length > 0 && !GameState.isInDialogue;
+  
+  // Handle input based on game state
+  if (GameState.isInDialogue) {
+    // Enable text input mode
+    input.setTextInputMode(true);
+    
+    // Handle dialogue input
+    if (input.isKeyPressed('Escape')) {
+      dialogueSystem.endDialogue();
+      GameState.isInDialogue = false;
+      GameState.currentNPC = null;
+      input.setTextInputMode(false);
+    }
+    
+    // Handle text input for dialogue
+    const textInput = input.getTextInputEvent();
+    if (textInput) {
+      dialogueSystem.handleInput(textInput);
+    }
+    
+  } else {
+    // Disable text input mode
+    input.setTextInputMode(false);
+    // Handle movement input - check for newly pressed keys
+    let dx = 0, dy = 0;
+    
+    if (input.isKeyPressed('KeyW') || input.isKeyPressed('ArrowUp')) {
+      dy = -1;
+      console.log('Movement: UP');
+    } else if (input.isKeyPressed('KeyS') || input.isKeyPressed('ArrowDown')) {
+      dy = 1;
+      console.log('Movement: DOWN');
+    } else if (input.isKeyPressed('KeyA') || input.isKeyPressed('ArrowLeft')) {
+      dx = -1;
+      console.log('Movement: LEFT');
+    } else if (input.isKeyPressed('KeyD') || input.isKeyPressed('ArrowRight')) {
+      dx = 1;
+      console.log('Movement: RIGHT');
+    }
+    
+    if (dx !== 0 || dy !== 0) {
+      console.log('Attempting move:', { dx, dy });
+      const moved = player.tryMove(dx, dy, world);
+      console.log('Move successful:', moved);
+    }
+    
+    // Handle interaction input
+    if (input.isInteractionPressed() && GameState.canInteract) {
+      const npc = nearbyNPCs[0]; // Interact with first nearby NPC
+      GameState.currentNPC = npc;
+      GameState.isInDialogue = true;
+      
+      // Start dialogue
+      npc.startDialogue().then(response => {
+        dialogueSystem.startDialogue(npc, response);
+      });
+    }
   }
   
   // Update player animation
   player.update(dt, world);
   
-  // Update input system
+  // Update dialogue system
+  dialogueSystem.update(dt);
+  
+  // Update input system last (clears pressed/released states)
   input.update();
   
   // Update game state
@@ -45,7 +123,7 @@ function update(dt) {
 function render() {
   if (!gameRunning) return;
   
-  renderer.render(world, player, true);
+  renderer.render(world, player, dialogueSystem, GameState, true);
 }
 
 // Initialize and start the game
@@ -55,10 +133,30 @@ function init() {
   console.log('Controls: WASD or Arrow Keys to move');
   console.log('Player starting position:', GameState.playerPos);
   
+  // Validate player starting position
+  const playerPos = GameState.playerPos;
+  const isValidPos = world.isValidPosition(playerPos.x, playerPos.y);
+  console.log('Player position valid?', isValidPos);
+  console.log('Player tile type:', world.getTile(playerPos.x, playerPos.y));
+  
+  // List all NPCs and their positions
+  console.log('NPCs:');
+  world.getNPCs().forEach(npc => {
+    const pos = npc.getGridPosition();
+    const isValid = world.isValidPosition(pos.x, pos.y);
+    console.log(`- ${npc.name} at (${pos.x}, ${pos.y}) - Valid: ${isValid}`);
+  });
+  
+  // Test movement manually
+  console.log('Testing manual movement...');
+  const testMove = player.tryMove(1, 0, world);
+  console.log('Manual move test (right):', testMove);
+  
   // Start the game loop
   startGameLoop(update, render);
   
   console.log('Game started successfully!');
+  console.log('Click the canvas and try pressing WASD or arrow keys');
 }
 
 // Start the game with error handling
