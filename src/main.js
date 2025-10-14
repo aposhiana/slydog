@@ -21,12 +21,51 @@ const dialogueSystem = new DialogueSystem(canvas);
 // Ensure canvas has focus for keyboard input
 canvas.addEventListener('click', () => {
   canvas.focus();
-  console.log('Canvas clicked, focus set');
 });
 
 // Set tabindex to make canvas focusable
 canvas.setAttribute('tabindex', '0');
 canvas.focus();
+
+// Simple text input buffer for dialogue
+let textInputBuffer = '';
+let isDialogueInputActive = false;
+
+// Direct text input handler for dialogue
+document.addEventListener('keydown', (e) => {
+  if (isDialogueInputActive && GameState.isInDialogue) {
+    if (e.key === 'Enter') {
+      if (textInputBuffer.trim()) {
+        // Clear the input immediately and disable input display
+        const message = textInputBuffer.trim();
+        textInputBuffer = '';
+        dialogueSystem.hideInput();
+        
+        // Submit the text and get response
+        if (dialogueSystem.currentNPC) {
+          dialogueSystem.currentNPC.continueDialogue(message).then(response => {
+            dialogueSystem.continueDialogue(response);
+          });
+        }
+      }
+      e.preventDefault();
+    } else if (e.key === 'Backspace') {
+      textInputBuffer = textInputBuffer.slice(0, -1);
+      e.preventDefault();
+    } else if (e.key === 'ArrowUp' && dialogueSystem.maxScrollOffset > 0) {
+      // Scroll up in dialogue
+      dialogueSystem.scrollOffset = Math.max(0, dialogueSystem.scrollOffset - 20);
+      e.preventDefault();
+    } else if (e.key === 'ArrowDown' && dialogueSystem.maxScrollOffset > 0) {
+      // Scroll down in dialogue
+      dialogueSystem.scrollOffset = Math.min(dialogueSystem.maxScrollOffset, dialogueSystem.scrollOffset + 20);
+      e.preventDefault();
+    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+      textInputBuffer += e.key;
+      e.preventDefault();
+    }
+  }
+});
 
 // Game state
 let gameRunning = true;
@@ -44,26 +83,20 @@ function update(dt) {
   // Handle input based on game state
   if (GameState.isInDialogue) {
     // Enable text input mode
-    input.setTextInputMode(true);
+    isDialogueInputActive = true;
     
     // Handle dialogue input
     if (input.isKeyPressed('Escape')) {
       dialogueSystem.endDialogue();
       GameState.isInDialogue = false;
       GameState.currentNPC = null;
-      input.setTextInputMode(false);
-    }
-    
-    // Handle text input for dialogue
-    const textInput = input.getTextInputEvent();
-    if (textInput) {
-      console.log('TEXT INPUT DETECTED:', textInput);
-      dialogueSystem.handleInput(textInput);
+      isDialogueInputActive = false;
+      textInputBuffer = '';
     }
     
   } else {
     // Disable text input mode
-    input.setTextInputMode(false);
+    isDialogueInputActive = false;
     // Handle movement input - check for newly pressed keys
     let dx = 0, dy = 0;
     
@@ -100,6 +133,11 @@ function update(dt) {
   // Update dialogue system
   dialogueSystem.update(dt);
   
+  // Sync text input buffer with dialogue system
+  if (isDialogueInputActive && GameState.isInDialogue) {
+    dialogueSystem.setPlayerInput(textInputBuffer);
+  }
+  
   // Update input system last (clears pressed/released states)
   input.update();
   
@@ -118,36 +156,18 @@ function render() {
 
 // Initialize and start the game
 function init() {
-  console.log('🚂 TRAIN MYSTERY GAME - VERSION 999 LOADED! 🚂');
-  console.log('🚂 TEXT INPUT FIX APPLIED! 🚂');
   console.log('Initializing Train Mystery Game...');
-  console.log('Controls: WASD or Arrow Keys to move');
   console.log('Player starting position:', GameState.playerPos);
   
   // Validate player starting position
   const playerPos = GameState.playerPos;
   const isValidPos = world.isValidPosition(playerPos.x, playerPos.y);
   console.log('Player position valid?', isValidPos);
-  console.log('Player tile type:', world.getTile(playerPos.x, playerPos.y));
-  
-  // List all NPCs and their positions
-  console.log('NPCs:');
-  world.getNPCs().forEach(npc => {
-    const pos = npc.getGridPosition();
-    const isValid = world.isValidPosition(pos.x, pos.y);
-    console.log(`- ${npc.name} at (${pos.x}, ${pos.y}) - Valid: ${isValid}`);
-  });
-  
-  // Test movement manually
-  console.log('Testing manual movement...');
-  const testMove = player.tryMove(1, 0, world);
-  console.log('Manual move test (right):', testMove);
   
   // Start the game loop
   startGameLoop(update, render);
   
   console.log('Game started successfully!');
-  console.log('Click the canvas and try pressing WASD or arrow keys');
 }
 
 // Start the game with error handling
