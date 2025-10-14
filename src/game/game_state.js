@@ -7,6 +7,7 @@ export const GameState = {
   ownedClues: new Set(),
   isLevelComplete: false,
   victoryMessage: "",
+  shouldCheckVictoryOnDialogueEnd: false,
   
   // Dialogue state
   isInDialogue: false,
@@ -66,7 +67,7 @@ export function checkLevelComplete(requiredClues) {
   
   if (hasAllClues && !GameState.isLevelComplete) {
     GameState.isLevelComplete = true;
-    GameState.victoryMessage = "🎉 Level Complete! 🎉";
+    GameState.victoryMessage = "🎉 Mystery Solved! 🎉";
     console.log("🏆 VICTORY! All clues collected!");
     console.log("🔍 Final clues:", Array.from(GameState.ownedClues));
   }

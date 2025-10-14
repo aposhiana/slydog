@@ -60,13 +60,13 @@ document.addEventListener('keydown', (e) => {
                 // Grant clue and get special response
                 npc.grantClue(world.getClues()).then(clueGranted => {
                   if (clueGranted) {
-                    // Check if level is complete
-                    world.checkLevelComplete(GameState.ownedClues);
-                    
-                    // Get clue-specific response
+                    // Get clue-specific response first
                     const clue = world.getClues()[npc.clueId];
                     const clueResponse = `I have something important to tell you: ${clue.description}`;
                     dialogueSystem.continueDialogue(clueResponse);
+                    
+                    // Mark that we should check for victory when dialogue ends
+                    GameState.shouldCheckVictoryOnDialogueEnd = true;
                   } else {
                     // Normal dialogue
                     npc.continueDialogue(message).then(response => {
@@ -150,6 +150,12 @@ function update(dt) {
       GameState.currentNPC = null;
       isDialogueInputActive = false;
       textInputBuffer = '';
+      
+      // Check for victory condition when dialogue ends
+      if (GameState.shouldCheckVictoryOnDialogueEnd) {
+        GameState.shouldCheckVictoryOnDialogueEnd = false;
+        world.checkLevelComplete(GameState.ownedClues);
+      }
     }
     
   } else {
@@ -238,6 +244,7 @@ function restartGame() {
   GameState.victoryMessage = '';
   GameState.isInDialogue = false;
   GameState.currentNPC = null;
+  GameState.shouldCheckVictoryOnDialogueEnd = false;
   
   // Reset player position
   GameState.playerPos.x = 2;

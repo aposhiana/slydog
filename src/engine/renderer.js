@@ -211,7 +211,7 @@ export class Renderer {
     // Subtitle
     this.ctx.font = '16px monospace';
     this.ctx.fillStyle = '#cccccc';
-    this.ctx.fillText('Press R to restart', centerX, centerY + 20);
+    this.ctx.fillText('All clues collected! Press R to restart', centerX, centerY + 20);
     
     // Reset text alignment
     this.ctx.textAlign = 'left';
