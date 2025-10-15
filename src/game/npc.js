@@ -50,7 +50,7 @@ export class NPC {
   getSystemPrompt() {
     return `You are ${this.name}, ${this.persona}. Keep responses brief (1-2 sentences) and in character. You're speaking to a passenger on a train. 
 
-When discussing topics related to available clues, you MUST call the grantClue function using the function calling system. Do not write function calls as text.`;
+When the passenger asks about topics you know about, call the grantClue function to share that information with them.`;
   }
 
   // Start dialogue with this NPC
@@ -79,10 +79,10 @@ When discussing topics related to available clues, you MUST call the grantClue f
       // Add context about available clues
       if (availableClues.length > 0) {
         const clueContext = availableClues.map(clue => 
-          `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}`
+          `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}\n  When granting this clue, explain: ${clue.description}`
         ).join('\n');
         
-        messages[0].content += `\n\nYou have access to these clues that you can reveal:\n${clueContext}\n\nWhen discussing these topics, you MUST call the grantClue function using the function calling system. Do not write function calls as text.`;
+        messages[0].content += `\n\nYou have access to these clues that you can reveal:\n${clueContext}\n\nWhen the passenger asks about these topics, call the grantClue function to share that information.`;
       }
       
       const response = await sendChat(messages, {
@@ -127,10 +127,10 @@ When discussing topics related to available clues, you MUST call the grantClue f
       // Add context about available clues
       if (availableClues.length > 0) {
         const clueContext = availableClues.map(clue => 
-          `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}`
+          `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}\n  When granting this clue, explain: ${clue.description}`
         ).join('\n');
         
-        messages[0].content += `\n\nYou have access to these clues that you can reveal:\n${clueContext}\n\nWhen discussing these topics, you MUST call the grantClue function using the function calling system. Do not write function calls as text.`;
+        messages[0].content += `\n\nYou have access to these clues that you can reveal:\n${clueContext}\n\nWhen the passenger asks about these topics, call the grantClue function to share that information.`;
       }
       
       const response = await sendChat(messages, {

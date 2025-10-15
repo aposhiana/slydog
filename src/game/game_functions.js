@@ -85,7 +85,7 @@ export const GAME_FUNCTIONS = [
     type: "function",
     function: {
       name: "grantClue",
-      description: "Grant a clue to the player when discussing relevant topics. Use the conversation_lead hints to know when to grant clues.",
+      description: "Give the player a clue when they ask about relevant topics. Use this function to share information you know about.",
       parameters: {
         type: "object",
         properties: {

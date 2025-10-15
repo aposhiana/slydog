@@ -94,6 +94,44 @@ async function handleFunctionCalls(toolCalls, npc) {
   }
 }
 
+async function continueConversationWithClue(npc, allClues) {
+  try {
+    // Get the most recently granted clue
+    const recentClueId = Array.from(GameState.ownedClues).slice(-1)[0];
+    if (!recentClueId) {
+      console.log(`⚠️ No recent clue found to continue conversation with`);
+      return;
+    }
+    
+    const clue = allClues[recentClueId];
+    if (!clue) {
+      console.log(`⚠️ Clue ${recentClueId} not found in allClues`);
+      return;
+    }
+    
+    console.log(`📝 Continuing conversation with clue: ${clue.name} - ${clue.description}`);
+    
+    // Create a simple prompt asking ChatGPT to continue the conversation with the clue info
+    const continuePrompt = `Continue the conversation naturally by sharing this information: ${clue.description}. Keep it brief and in character as ${npc.name}.`;
+    
+    const { sendChat } = await import('./ai/openai_client.js');
+    const response = await sendChat([
+      { role: "system", content: npc.getSystemPrompt() },
+      { role: "user", content: continuePrompt }
+    ]);
+    
+    if (response.content && response.content.trim()) {
+      console.log(`💬 ChatGPT continued conversation: ${response.content}`);
+      dialogueSystem.continueDialogue(response.content);
+    } else {
+      console.log(`⚠️ No continuation response from ChatGPT`);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error continuing conversation with clue:', error);
+  }
+}
+
 // Handle level completion and progression
 async function handleLevelCompletion() {
   // Check if current level is complete
@@ -168,14 +206,26 @@ document.addEventListener('keydown', (e) => {
           const npc = dialogueSystem.currentNPC;
           
           // Use function calling for dialogue
-          npc.continueDialogue(message, world.getClues(), GameState.ownedClues).then(response => {
-            // Display the NPC's response
-            dialogueSystem.continueDialogue(response.content);
+          npc.continueDialogue(message, world.getClues(), GameState.ownedClues).then(async response => {
+            console.log(`🔍 Full response:`, response);
+            
+            // Display the NPC's response (even if empty, we'll handle function calls)
+            if (response.content && response.content.trim()) {
+              dialogueSystem.continueDialogue(response.content);
+            } else {
+              console.log(`⚠️ No text content in response, only function calls`);
+            }
             
             // Handle any function calls
             if (response.tool_calls && response.tool_calls.length > 0) {
               console.log(`🤖 ChatGPT returned ${response.tool_calls.length} function call(s)`);
-              handleFunctionCalls(response.tool_calls, npc);
+              await handleFunctionCalls(response.tool_calls, npc);
+              
+              // After function calls, get ChatGPT to continue the conversation with clue info
+              if (response.tool_calls.some(call => call.function.name === 'grantClue')) {
+                console.log(`🔄 Getting ChatGPT to continue conversation with clue info...`);
+                await continueConversationWithClue(npc, world.getClues());
+              }
             } else {
               console.log(`💬 ChatGPT response (no function calls)`);
             }
