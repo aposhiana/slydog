@@ -204,7 +204,7 @@ export class Renderer {
     // Victory message background
     const centerX = CANVAS_WIDTH / 2;
     const centerY = CANVAS_HEIGHT / 2;
-    const boxWidth = 400;
+    const boxWidth = 500;
     const boxHeight = 200;
     
     this.ctx.fillStyle = '#2a4d3a';
@@ -226,7 +226,7 @@ export class Renderer {
           this.ctx.fillStyle = '#cccccc';
           const subtitle = gameState.isGameComplete ? 
             'All levels completed! Press R to restart' : 
-            'All clues collected! Press R to restart';
+            'All clues collected! Press Enter to continue';
           this.ctx.fillText(subtitle, centerX, centerY + 20);
     
     // Reset text alignment

@@ -255,9 +255,14 @@ document.addEventListener('keydown', (e) => {
 
 // Global next level handler (separate from dialogue system)
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'r' && (GameState.isLevelComplete || GameState.isGameComplete)) {
+  if (GameState.isLevelComplete && e.key === 'Enter') {
     console.log('🔄 Next level key pressed!');
     advanceToNextLevel();
+    e.preventDefault();
+    return false;
+  } else if (GameState.isGameComplete && e.key === 'r') {
+    console.log('🔄 Restart game key pressed!');
+    restartToLevel1();
     e.preventDefault();
     return false;
   }
@@ -401,7 +406,7 @@ async function advanceToNextLevel() {
       console.log(`➡️ Advancing to ${nextLevelId}...`);
       
       // Reset game state
-      GameState.reset();
+      GameState.ownedClues.clear();
       GameState.isLevelComplete = false;
       GameState.isGameComplete = false;
       
@@ -424,6 +429,33 @@ async function advanceToNextLevel() {
     }
   } catch (error) {
     console.error(`❌ Failed to advance to next level:`, error);
+  }
+}
+
+// Restart to level 1 function (for game completion)
+async function restartToLevel1() {
+  console.log(`🔄 Restarting to level 1...`);
+  
+  try {
+    // Reset game state
+    GameState.ownedClues.clear();
+    GameState.isLevelComplete = false;
+    GameState.isGameComplete = false;
+    
+    // Reset to level 1
+    currentLevelId = 'level_1';
+    await initializeLevel(currentLevelId);
+    
+    // End any active dialogue
+    dialogueSystem.endDialogue();
+    
+    // Clear text input buffer
+    textInputBuffer = '';
+    isDialogueInputActive = false;
+    
+    console.log(`✅ Restarted to level ${currentLevelId}!`);
+  } catch (error) {
+    console.error(`❌ Failed to restart to level 1:`, error);
   }
 }
 
