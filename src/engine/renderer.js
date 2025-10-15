@@ -54,9 +54,22 @@ export class Renderer {
           this.ctx.fillStyle = COLORS.FLOOR;
         } else if (tileType === TILE_TYPES.WALL) {
           this.ctx.fillStyle = COLORS.WALL;
+        } else if (tileType === TILE_TYPES.SEAT) {
+          this.ctx.fillStyle = COLORS.SEAT;
         }
         
         this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+        
+        // Draw seat details
+        if (tileType === TILE_TYPES.SEAT) {
+          // Draw seat back
+          this.ctx.fillStyle = '#8B4513';
+          this.ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, 8);
+          
+          // Draw seat base
+          this.ctx.fillStyle = '#654321';
+          this.ctx.fillRect(screenX + 2, screenY + 22, TILE_SIZE - 4, 8);
+        }
         
         // Draw tile border
         this.ctx.strokeStyle = COLORS.GRID;

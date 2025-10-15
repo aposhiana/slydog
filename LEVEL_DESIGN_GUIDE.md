@@ -15,10 +15,12 @@ Create a new file in `/src/levels/` following the naming pattern `level_X.json`:
   "description": "The mystery reaches its climax. Find the final clues.",
   "next_level": null,
   "tilemap": [
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-    // ... rest of tilemap (20x12 grid)
-    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    // ... rest of tilemap (32x11 grid with seats)
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
   ],
   "required_clues": ["clue_f", "clue_g"],
   "clues": {
@@ -47,7 +49,7 @@ Create a new file in `/src/levels/` following the naming pattern `level_X.json`:
 - **name**: Display name for the level
 - **description**: Brief description of the level's mystery
 - **next_level**: ID of next level (null for final level)
-- **tilemap**: 20x12 grid where 0=floor, 1=wall
+- **tilemap**: 32x11 grid where 0=floor, 1=wall, 2=seat
 - **required_clues**: Array of clue IDs needed to complete the level
 - **clues**: Object defining all clues in this level
 - **npcs**: Array of NPCs to place in this level
@@ -102,7 +104,7 @@ Add the NPC to a level's `npcs` array:
 ```
 
 - **character_id**: Must match the ID in the character JSON file
-- **position**: [x, y] grid coordinates (0-19, 0-11)
+- **position**: [x, y] grid coordinates (0-31, 0-10)
 - **clue_id**: Optional clue this NPC provides (null for no clue)
 
 ## Level Progression
@@ -129,6 +131,28 @@ The game validates that:
 - No circular dependencies
 - Dependencies are satisfied before granting clues
 
+## Train Layout Design
+
+The game uses a train-like layout with:
+
+- **32x11 grid**: Longer and narrower to simulate train cars
+- **Seat rows**: Pattern of seats (2) with aisle (0) for walking
+- **Walls**: Outer walls (1) and aisle boundaries
+- **Movement**: Player walks left-to-right down the aisle
+- **NPCs**: Stationed in seats or walking in the aisle
+
+### Tile Types:
+- **0 (Floor)**: Walkable aisle space
+- **1 (Wall)**: Impassable walls and boundaries  
+- **2 (Seat)**: Train seats that block movement
+
+### Layout Pattern:
+```
+[1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1]
+[1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1]
+[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
+```
+
 ## Tips
 
 1. **Reuse NPCs**: You can use the same character in multiple levels
@@ -136,6 +160,8 @@ The game validates that:
 3. **Clear Hints**: Provide helpful hints for unavailable clues
 4. **Balanced Difficulty**: Don't make dependencies too complex
 5. **Test Thoroughly**: Verify clue graph validation passes
+6. **Train Realism**: Place NPCs in seats or aisle positions
+7. **Seat Collisions**: Remember seats block movement
 
 ## Example Level Sequence
 

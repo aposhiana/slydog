@@ -1,0 +1,8 @@
+{
+  "id": "passenger3",
+  "name": "Sleeping Passenger",
+  "color": "#95a5a6",
+  "persona": "a tired passenger who has been sleeping most of the journey",
+  "dialogue_style": "groggy and confused",
+  "description": "A passenger who has been napping"
+}

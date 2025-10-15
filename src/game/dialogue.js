@@ -6,6 +6,7 @@ export class DialogueSystem {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     
+    
     // Dialogue panel dimensions
     this.panelHeight = 200; // Even taller for long responses
     this.panelY = CANVAS_HEIGHT - this.panelHeight;

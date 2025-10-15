@@ -48,14 +48,14 @@ export class World {
     return this.currentLevel;
   }
 
-  // Check if a position is valid (within bounds and not a wall)
+  // Check if a position is valid (within bounds and walkable)
   isValidPosition(x, y) {
     // Check bounds
     if (x < 0 || x >= GRID_W || y < 0 || y >= GRID_H) {
       return false;
     }
     
-    // Check if tile is walkable
+    // Check if tile is walkable (floor only, not walls or seats)
     return this.tilemap[y][x] === TILE_TYPES.FLOOR;
   }
 

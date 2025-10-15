@@ -6,12 +6,18 @@ import { Player } from './game/player.js';
 import { GameState, resetForNewLevel, markGameComplete } from './game/game_state.js';
 import { DialogueSystem } from './game/dialogue.js';
 import { loadLevel, levelExists } from './game/level_loader.js';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from './shared/constants.js';
 
 // Get canvas element
 const canvas = document.getElementById('gameCanvas');
 if (!canvas) {
   throw new Error('Canvas element not found');
 }
+
+// Set canvas size dynamically based on constants
+canvas.width = CANVAS_WIDTH;
+canvas.height = CANVAS_HEIGHT;
+console.log(`🎨 Canvas size set to: ${CANVAS_WIDTH}x${CANVAS_HEIGHT}`);
 
 // Initialize game systems
 const world = new World();
