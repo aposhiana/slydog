@@ -172,9 +172,9 @@ export class Renderer {
       dialogueSystem.render();
     }
     
-    // Render victory overlay if level is complete
-    if (gameState.isLevelComplete) {
-      this.renderVictoryOverlay(gameState.victoryMessage);
+    // Render victory overlay if level is complete or game is complete
+    if (gameState.isLevelComplete || gameState.isGameComplete) {
+      this.renderVictoryOverlay(gameState.victoryMessage, gameState);
     }
     
     if (showDebug) {
@@ -183,7 +183,7 @@ export class Renderer {
   }
 
   // Render victory overlay
-  renderVictoryOverlay(message) {
+  renderVictoryOverlay(message, gameState) {
     // Semi-transparent overlay
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
     this.ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -208,10 +208,13 @@ export class Renderer {
     this.ctx.textAlign = 'center';
     this.ctx.fillText(message, centerX, centerY - 20);
     
-    // Subtitle
-    this.ctx.font = '16px monospace';
-    this.ctx.fillStyle = '#cccccc';
-    this.ctx.fillText('All clues collected! Press R to restart', centerX, centerY + 20);
+          // Subtitle
+          this.ctx.font = '16px monospace';
+          this.ctx.fillStyle = '#cccccc';
+          const subtitle = gameState.isGameComplete ? 
+            'All levels completed! Press R to restart' : 
+            'All clues collected! Press R to restart';
+          this.ctx.fillText(subtitle, centerX, centerY + 20);
     
     // Reset text alignment
     this.ctx.textAlign = 'left';

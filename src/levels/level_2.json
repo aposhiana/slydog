@@ -1,0 +1,55 @@
+{
+  "id": "level_2",
+  "name": "The Investigation Continues",
+  "description": "The mystery deepens. More clues await on this new section of the train.",
+  "next_level": null,
+  "tilemap": [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  ],
+  "required_clues": ["clue_d", "clue_e"],
+  "clues": {
+    "clue_d": {
+      "id": "clue_d",
+      "name": "Detective's Findings",
+      "description": "The railway inspector has discovered that the stolen cargo contained rare artifacts. The theft was well-planned and coordinated.",
+      "hint": "Detective Martinez has been investigating this case for weeks.",
+      "dependencies": []
+    },
+    "clue_e": {
+      "id": "clue_e",
+      "name": "Engineer's Discovery",
+      "description": "The train's engineer found evidence that someone tampered with the locomotive's systems to ensure the delay at the last station.",
+      "hint": "Engineer Williams knows every mechanical detail of this train.",
+      "dependencies": ["clue_d"]
+    }
+  },
+  "npcs": [
+    {
+      "character_id": "inspector",
+      "position": [5, 5],
+      "clue_id": "clue_d"
+    },
+    {
+      "character_id": "engineer",
+      "position": [14, 8],
+      "clue_id": "clue_e"
+    },
+    {
+      "character_id": "conductor",
+      "position": [10, 3],
+      "clue_id": null
+    }
+  ],
+  "player_start": [2, 2]
+}

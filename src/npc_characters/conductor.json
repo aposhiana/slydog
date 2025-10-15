@@ -1,0 +1,8 @@
+{
+  "id": "conductor",
+  "name": "Conductor Smith",
+  "color": "#ff6b6b",
+  "persona": "a friendly train conductor who has been working this route for 20 years",
+  "dialogue_style": "professional and helpful",
+  "description": "The train's conductor, responsible for passenger safety and schedule management"
+}

@@ -1,0 +1,67 @@
+{
+  "id": "level_1",
+  "name": "The Mysterious Cargo",
+  "description": "Something unusual happened during the last stop. Investigate the train to find clues.",
+  "next_level": "level_2",
+  "tilemap": [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  ],
+  "required_clues": ["clue_a", "clue_b", "clue_c"],
+  "clues": {
+    "clue_a": {
+      "id": "clue_a",
+      "name": "Conductor's Schedule",
+      "description": "The conductor's schedule shows an unusual delay at the last stop. The train was held for 45 minutes due to 'cargo inspection'.",
+      "hint": "Talk to the conductor to learn about the train schedule.",
+      "dependencies": []
+    },
+    "clue_b": {
+      "id": "clue_b",
+      "name": "Passenger's Observation",
+      "description": "A passenger noticed someone suspicious getting off at the previous station carrying a large, heavy bag. They seemed nervous and kept looking around.",
+      "hint": "Mrs. Johnson might have seen something interesting.",
+      "dependencies": ["clue_a"]
+    },
+    "clue_c": {
+      "id": "clue_c",
+      "name": "Security Report",
+      "description": "The security guard found evidence of tampering in the luggage car. Several locks were broken and some cargo appears to be missing.",
+      "hint": "Officer Davis has important security information.",
+      "dependencies": ["clue_b"]
+    }
+  },
+  "npcs": [
+    {
+      "character_id": "conductor",
+      "position": [3, 3],
+      "clue_id": "clue_a"
+    },
+    {
+      "character_id": "passenger",
+      "position": [8, 4],
+      "clue_id": "clue_b"
+    },
+    {
+      "character_id": "chef",
+      "position": [16, 7],
+      "clue_id": null
+    },
+    {
+      "character_id": "guard",
+      "position": [12, 2],
+      "clue_id": "clue_c"
+    }
+  ],
+  "player_start": [2, 2]
+}

@@ -3,8 +3,9 @@ import { input } from './engine/input.js';
 import { Renderer } from './engine/renderer.js';
 import { World } from './game/world.js';
 import { Player } from './game/player.js';
-import { GameState } from './game/game_state.js';
+import { GameState, resetForNewLevel, markGameComplete } from './game/game_state.js';
 import { DialogueSystem } from './game/dialogue.js';
+import { loadLevel, levelExists } from './game/level_loader.js';
 
 // Get canvas element
 const canvas = document.getElementById('gameCanvas');
@@ -14,9 +15,68 @@ if (!canvas) {
 
 // Initialize game systems
 const world = new World();
-const player = new Player(GameState.playerPos.x, GameState.playerPos.y);
+const player = new Player(2, 2); // Default position, will be set by level data
 const renderer = new Renderer(canvas);
 const dialogueSystem = new DialogueSystem(canvas);
+
+// Current level ID
+let currentLevelId = 'level_1';
+
+// Load and initialize a level
+async function initializeLevel(levelId) {
+  try {
+    console.log(`🚂 TRAIN MYSTERY GAME - Loading Level ${levelId} 🚂`);
+    
+    // Load level data
+    const levelData = await loadLevel(levelId);
+    
+    // Initialize world with level data
+    world.initializeLevel(levelData);
+    
+    // Reset game state for new level
+    resetForNewLevel(levelData);
+    
+    // Update player position
+    player.setPosition(GameState.playerPos.x, GameState.playerPos.y);
+    
+    console.log(`✅ Level ${levelId} initialized successfully!`);
+    console.log(`📊 ${levelData.npcs.length} NPCs, ${Object.keys(levelData.clues).length} clues`);
+    
+  } catch (error) {
+    console.error(`❌ Failed to initialize level ${levelId}:`, error);
+    throw error;
+  }
+}
+
+// Handle level completion and progression
+async function handleLevelCompletion() {
+  // Check if current level is complete
+  const isComplete = world.checkLevelComplete(GameState.ownedClues);
+  
+  if (isComplete) {
+    console.log(`🏆 Level ${currentLevelId} completed!`);
+    
+    // Check if there's a next level
+    if (world.hasNextLevel()) {
+      const nextLevelId = world.getNextLevel();
+      console.log(`➡️ Advancing to ${nextLevelId}...`);
+      
+      try {
+        // Load next level
+        currentLevelId = nextLevelId;
+        await initializeLevel(nextLevelId);
+      } catch (error) {
+        console.error(`❌ Failed to load next level ${nextLevelId}:`, error);
+        // Fall back to restarting current level
+        await initializeLevel(currentLevelId);
+      }
+    } else {
+      // No more levels - game complete
+      console.log(`🎉 Game complete! No more levels.`);
+      markGameComplete();
+    }
+  }
+}
 
 // Ensure canvas has focus for keyboard input
 canvas.addEventListener('click', () => {
@@ -34,9 +94,9 @@ let isDialogueInputActive = false;
 // Direct text input handler for dialogue
 document.addEventListener('keydown', (e) => {
   // Handle restart key when level is complete (highest priority)
-  if (e.key === 'r' && GameState.isLevelComplete) {
+  if (e.key === 'r' && (GameState.isLevelComplete || GameState.isGameComplete)) {
     console.log('🔄 Restart key pressed!');
-    restartGame();
+    restartCurrentLevel();
     e.preventDefault();
     return;
   }
@@ -117,9 +177,9 @@ document.addEventListener('keydown', (e) => {
 
 // Global restart handler (separate from dialogue system)
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'r' && GameState.isLevelComplete) {
+  if (e.key === 'r' && (GameState.isLevelComplete || GameState.isGameComplete)) {
     console.log('🔄 Global restart key pressed!');
-    restartGame();
+    restartCurrentLevel();
     e.preventDefault();
     return false;
   }
@@ -154,7 +214,7 @@ function update(dt) {
       // Check for victory condition when dialogue ends
       if (GameState.shouldCheckVictoryOnDialogueEnd) {
         GameState.shouldCheckVictoryOnDialogueEnd = false;
-        world.checkLevelComplete(GameState.ownedClues);
+        handleLevelCompletion();
       }
     }
     
@@ -219,46 +279,41 @@ function render() {
 }
 
 // Initialize and start the game
-function init() {
-  console.log('Initializing Train Mystery Game...');
-  console.log('Player starting position:', GameState.playerPos);
+async function init() {
+  console.log('🚂 TRAIN MYSTERY GAME - Initializing... 🚂');
   
-  // Validate player starting position
-  const playerPos = GameState.playerPos;
-  const isValidPos = world.isValidPosition(playerPos.x, playerPos.y);
-  console.log('Player position valid?', isValidPos);
-  
-  // Start the game loop
-  startGameLoop(update, render);
-  
-  console.log('Game started successfully!');
+  try {
+    // Load first level
+    await initializeLevel(currentLevelId);
+    
+    // Start the game loop
+    startGameLoop(update, render);
+    
+    console.log('✅ Game started successfully!');
+  } catch (error) {
+    console.error('❌ Failed to initialize game:', error);
+  }
 }
 
-// Restart game function
-function restartGame() {
-  console.log('🔄 Restarting game...');
+// Restart current level function
+async function restartCurrentLevel() {
+  console.log(`🔄 Restarting level ${currentLevelId}...`);
   
-  // Reset game state
-  GameState.ownedClues.clear();
-  GameState.isLevelComplete = false;
-  GameState.victoryMessage = '';
-  GameState.isInDialogue = false;
-  GameState.currentNPC = null;
-  GameState.shouldCheckVictoryOnDialogueEnd = false;
-  
-  // Reset player position
-  GameState.playerPos.x = 2;
-  GameState.playerPos.y = 2;
-  player.setPosition(GameState.playerPos.x, GameState.playerPos.y);
-  
-  // End any active dialogue
-  dialogueSystem.endDialogue();
-  
-  // Clear text input buffer
-  textInputBuffer = '';
-  isDialogueInputActive = false;
-  
-  console.log('✅ Game restarted!');
+  try {
+    // Reinitialize current level
+    await initializeLevel(currentLevelId);
+    
+    // End any active dialogue
+    dialogueSystem.endDialogue();
+    
+    // Clear text input buffer
+    textInputBuffer = '';
+    isDialogueInputActive = false;
+    
+    console.log(`✅ Level ${currentLevelId} restarted!`);
+  } catch (error) {
+    console.error(`❌ Failed to restart level ${currentLevelId}:`, error);
+  }
 }
 
 // Start the game with error handling

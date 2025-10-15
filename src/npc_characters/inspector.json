@@ -1,0 +1,8 @@
+{
+  "id": "inspector",
+  "name": "Detective Martinez",
+  "color": "#d4a574",
+  "persona": "a railway inspector investigating unusual activity on this route",
+  "dialogue_style": "methodical and questioning",
+  "description": "A railway detective who has been investigating suspicious activity"
+}

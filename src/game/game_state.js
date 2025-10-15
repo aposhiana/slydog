@@ -1,6 +1,6 @@
 export const GameState = {
-  levelId: "level_1",
-  playerPos: { x: 2, y: 2 },
+  levelId: null, // Will be set when level loads
+  playerPos: { x: 2, y: 2 }, // Default start position
   clues: new Set(), // Legacy - keeping for compatibility
   
   // Clue system state
@@ -8,6 +8,9 @@ export const GameState = {
   isLevelComplete: false,
   victoryMessage: "",
   shouldCheckVictoryOnDialogueEnd: false,
+  
+  // Level progression state
+  isGameComplete: false,
   
   // Dialogue state
   isInDialogue: false,
@@ -73,4 +76,45 @@ export function checkLevelComplete(requiredClues) {
   }
   
   return GameState.isLevelComplete;
+}
+
+/**
+ * Reset game state for a new level
+ * @param {Object} levelData - Level data from JSON
+ */
+export function resetForNewLevel(levelData) {
+  console.log(`🔄 Resetting game state for level: ${levelData.id}`);
+  
+  // Reset level-specific state
+  GameState.levelId = levelData.id;
+  GameState.ownedClues.clear();
+  GameState.isLevelComplete = false;
+  GameState.victoryMessage = "";
+  GameState.shouldCheckVictoryOnDialogueEnd = false;
+  GameState.isGameComplete = false;
+  
+  // Reset dialogue state
+  GameState.isInDialogue = false;
+  GameState.currentNPC = null;
+  GameState.dialogueHistory = [];
+  
+  // Reset interaction state
+  GameState.nearbyNPCs = [];
+  GameState.canInteract = false;
+  
+  // Set player start position from level data
+  GameState.playerPos.x = levelData.player_start[0];
+  GameState.playerPos.y = levelData.player_start[1];
+  
+  console.log(`✅ Game state reset for ${levelData.name}`);
+  console.log(`📍 Player start position: (${GameState.playerPos.x}, ${GameState.playerPos.y})`);
+}
+
+/**
+ * Mark game as complete (no more levels)
+ */
+export function markGameComplete() {
+  GameState.isGameComplete = true;
+  GameState.victoryMessage = "🎉 Game Complete! 🎉";
+  console.log("🏆 GAME COMPLETE! All levels finished!");
 }
