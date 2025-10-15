@@ -76,10 +76,9 @@ async function handleFunctionCalls(toolCalls, npc) {
           console.log(`✅ Clue granted successfully: ${args.clueId} - ${args.reason}`);
           console.log(`📊 Total clues owned: ${GameState.ownedClues.size}`);
           
-          // Check if this was the final clue
-          world.checkLevelComplete(GameState.ownedClues);
+          // Check if this was the final clue - but don't show victory screen yet
           if (world.checkLevelComplete(GameState.ownedClues)) {
-            console.log(`🏆 Level complete! Victory condition met.`);
+            console.log(`🏆 Level complete! Victory condition met. Will show victory screen when dialogue ends.`);
             GameState.shouldCheckVictoryOnDialogueEnd = true;
           }
         } else {
@@ -254,11 +253,11 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-// Global restart handler (separate from dialogue system)
+// Global next level handler (separate from dialogue system)
 document.addEventListener('keydown', (e) => {
   if (e.key === 'r' && (GameState.isLevelComplete || GameState.isGameComplete)) {
-    console.log('🔄 Global restart key pressed!');
-    restartCurrentLevel();
+    console.log('🔄 Next level key pressed!');
+    advanceToNextLevel();
     e.preventDefault();
     return false;
   }
@@ -293,7 +292,10 @@ function update(dt) {
       // Check for victory condition when dialogue ends
       if (GameState.shouldCheckVictoryOnDialogueEnd) {
         GameState.shouldCheckVictoryOnDialogueEnd = false;
-        handleLevelCompletion();
+        // Set victory state
+        GameState.isLevelComplete = true;
+        GameState.victoryMessage = "🎉 Mystery Solved! 🎉";
+        console.log("🏆 VICTORY! All clues collected!");
       }
     }
     
@@ -385,6 +387,43 @@ async function init() {
     console.log('✅ Game started successfully!');
   } catch (error) {
     console.error('❌ Failed to initialize game:', error);
+  }
+}
+
+// Advance to next level function
+async function advanceToNextLevel() {
+  console.log(`🔄 Advancing from level ${currentLevelId}...`);
+  
+  try {
+    // Check if there's a next level
+    if (world.hasNextLevel()) {
+      const nextLevelId = world.getNextLevel();
+      console.log(`➡️ Advancing to ${nextLevelId}...`);
+      
+      // Reset game state
+      GameState.reset();
+      GameState.isLevelComplete = false;
+      GameState.isGameComplete = false;
+      
+      // Load next level
+      currentLevelId = nextLevelId;
+      await initializeLevel(nextLevelId);
+      
+      // End any active dialogue
+      dialogueSystem.endDialogue();
+      
+      // Clear text input buffer
+      textInputBuffer = '';
+      isDialogueInputActive = false;
+      
+      console.log(`✅ Advanced to level ${currentLevelId}!`);
+    } else {
+      // No more levels - game complete
+      console.log(`🎉 Game complete! No more levels.`);
+      markGameComplete();
+    }
+  } catch (error) {
+    console.error(`❌ Failed to advance to next level:`, error);
   }
 }
 

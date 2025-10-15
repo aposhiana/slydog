@@ -82,13 +82,12 @@ export function checkLevelComplete(requiredClues) {
   const hasAllClues = requiredClues.every(clueId => GameState.ownedClues.has(clueId));
   
   if (hasAllClues && !GameState.isLevelComplete) {
-    GameState.isLevelComplete = true;
-    GameState.victoryMessage = "🎉 Mystery Solved! 🎉";
-    console.log("🏆 VICTORY! All clues collected!");
+    console.log("🏆 Level completion detected! Will show victory when dialogue ends.");
     console.log("🔍 Final clues:", Array.from(GameState.ownedClues));
+    return true;
   }
   
-  return GameState.isLevelComplete;
+  return hasAllClues;
 }
 
 /**
