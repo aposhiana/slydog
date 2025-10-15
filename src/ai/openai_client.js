@@ -3,16 +3,20 @@ const WORKER_URL = "https://train-mystery-proxy.andrewaposhian.workers.dev";
 
 export async function sendChat(messages, opts = {}) {
   try {
+    const requestBody = {
+      model: "gpt-4o-mini",
+      messages,
+      max_tokens: opts.max_tokens ?? 256,
+      tools: opts.tools || undefined,
+      tool_choice: opts.tool_choice || undefined,
+    };
+    
+    console.log("🔍 OpenAI Request:", JSON.stringify(requestBody, null, 2));
+    
     const response = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages,
-        max_tokens: opts.max_tokens ?? 256,
-        tools: opts.tools || undefined,
-        tool_choice: opts.tool_choice || undefined,
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     if (!response.ok) {
@@ -21,6 +25,8 @@ export async function sendChat(messages, opts = {}) {
     }
 
     const data = await response.json();
+    console.log("🔍 OpenAI Response:", JSON.stringify(data, null, 2));
+    
     const message = data?.choices?.[0]?.message;
     
     // Return both content and function calls if present

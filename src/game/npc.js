@@ -48,7 +48,9 @@ export class NPC {
 
   // Get system prompt for AI
   getSystemPrompt() {
-    return `You are ${this.name}, ${this.persona}. Keep responses brief (1-2 sentences) and in character. You're speaking to a passenger on a train.`;
+    return `You are ${this.name}, ${this.persona}. Keep responses brief (1-2 sentences) and in character. You're speaking to a passenger on a train. 
+
+When discussing topics related to available clues, you MUST call the grantClue function using the function calling system. Do not write function calls as text.`;
   }
 
   // Start dialogue with this NPC
@@ -80,7 +82,7 @@ export class NPC {
           `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}`
         ).join('\n');
         
-        messages[0].content += `\n\nYou have access to these clues that you can reveal. Use the conversation guidance to help steer the conversation naturally toward these topics:\n${clueContext}\n\nBe helpful and proactive in guiding the conversation. Don't wait for exact phrases - use the guidance to steer toward relevant topics and reveal clues when appropriate.`;
+        messages[0].content += `\n\nYou have access to these clues that you can reveal:\n${clueContext}\n\nWhen discussing these topics, you MUST call the grantClue function using the function calling system. Do not write function calls as text.`;
       }
       
       const response = await sendChat(messages, {
@@ -128,7 +130,7 @@ export class NPC {
           `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}`
         ).join('\n');
         
-        messages[0].content += `\n\nYou have access to these clues that you can reveal. Use the conversation guidance to help steer the conversation naturally toward these topics:\n${clueContext}\n\nBe helpful and proactive in guiding the conversation. Don't wait for exact phrases - use the guidance to steer toward relevant topics and reveal clues when appropriate.`;
+        messages[0].content += `\n\nYou have access to these clues that you can reveal:\n${clueContext}\n\nWhen discussing these topics, you MUST call the grantClue function using the function calling system. Do not write function calls as text.`;
       }
       
       const response = await sendChat(messages, {

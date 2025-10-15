@@ -58,20 +58,28 @@ async function initializeLevel(levelId) {
 
 // Handle function calls from ChatGPT
 async function handleFunctionCalls(toolCalls, npc) {
-  const { grantClue } = await import('./src/game/game_functions.js');
+  console.log(`🔧 Processing ${toolCalls.length} function call(s) from ${npc.name || 'NPC'}`);
+  
+  const { grantClue } = await import('./game/game_functions.js');
   
   for (const toolCall of toolCalls) {
+    console.log(`📞 Function call: ${toolCall.function.name}`, toolCall.function.arguments);
+    
     if (toolCall.function.name === 'grantClue') {
       try {
         const args = JSON.parse(toolCall.function.arguments);
+        console.log(`🎯 Attempting to grant clue: ${args.clueId} (reason: "${args.reason}")`);
+        
         const result = grantClue(args.clueId, args.reason);
         
         if (result.success) {
-          console.log(`✅ Clue granted: ${args.clueId} - ${args.reason}`);
+          console.log(`✅ Clue granted successfully: ${args.clueId} - ${args.reason}`);
+          console.log(`📊 Total clues owned: ${GameState.ownedClues.size}`);
           
           // Check if this was the final clue
           world.checkLevelComplete(GameState.ownedClues);
           if (world.checkLevelComplete(GameState.ownedClues)) {
+            console.log(`🏆 Level complete! Victory condition met.`);
             GameState.shouldCheckVictoryOnDialogueEnd = true;
           }
         } else {
@@ -80,6 +88,8 @@ async function handleFunctionCalls(toolCalls, npc) {
       } catch (error) {
         console.error('❌ Error executing grantClue function:', error);
       }
+    } else {
+      console.log(`⚠️ Unknown function call: ${toolCall.function.name}`);
     }
   }
 }
@@ -164,7 +174,10 @@ document.addEventListener('keydown', (e) => {
             
             // Handle any function calls
             if (response.tool_calls && response.tool_calls.length > 0) {
+              console.log(`🤖 ChatGPT returned ${response.tool_calls.length} function call(s)`);
               handleFunctionCalls(response.tool_calls, npc);
+            } else {
+              console.log(`💬 ChatGPT response (no function calls)`);
             }
           }).catch(error => {
             console.error('❌ Error in dialogue:', error);
@@ -266,7 +279,10 @@ function update(dt) {
         
         // Handle any function calls
         if (response.tool_calls && response.tool_calls.length > 0) {
+          console.log(`🤖 ChatGPT returned ${response.tool_calls.length} function call(s) on dialogue start`);
           handleFunctionCalls(response.tool_calls, npc);
+        } else {
+          console.log(`💬 ChatGPT response on dialogue start (no function calls)`);
         }
       });
     }

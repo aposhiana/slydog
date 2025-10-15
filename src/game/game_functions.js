@@ -10,11 +10,13 @@ import { GameState } from './game_state.js';
  * @returns {Object} Result of the operation
  */
 export function grantClue(clueId, reason) {
-  console.log(`🎯 Function call: grantClue(${clueId}, "${reason}")`);
+  console.log(`🎯 grantClue() called with clueId: "${clueId}", reason: "${reason}"`);
+  console.log(`📋 Current owned clues before grant:`, Array.from(GameState.ownedClues));
   
   try {
     // Check if clue already owned
     if (GameState.hasClue(clueId)) {
+      console.log(`⚠️ Clue ${clueId} already owned by player - skipping grant`);
       return {
         success: false,
         message: `Clue ${clueId} already owned by player`,
@@ -23,7 +25,10 @@ export function grantClue(clueId, reason) {
     }
     
     // Grant the clue
+    console.log(`➕ Granting clue ${clueId} to player...`);
     GameState.grantClue(clueId, {});
+    console.log(`✅ Clue ${clueId} successfully added to player inventory`);
+    console.log(`📋 Current owned clues after grant:`, Array.from(GameState.ownedClues));
     
     return {
       success: true,
@@ -33,7 +38,7 @@ export function grantClue(clueId, reason) {
     };
     
   } catch (error) {
-    console.error('Error in grantClue function:', error);
+    console.error('❌ Error in grantClue function:', error);
     return {
       success: false,
       message: `Error granting clue ${clueId}: ${error.message}`,
@@ -80,7 +85,7 @@ export const GAME_FUNCTIONS = [
     type: "function",
     function: {
       name: "grantClue",
-      description: "Reveal a clue to the player when the conversation naturally leads to it. Use the conversation_lead hints to guide the player toward discovering the clue. Be helpful and proactive in steering the conversation toward relevant topics. Don't wait for exact phrases - guide the conversation naturally.",
+      description: "Grant a clue to the player when discussing relevant topics. Use the conversation_lead hints to know when to grant clues.",
       parameters: {
         type: "object",
         properties: {

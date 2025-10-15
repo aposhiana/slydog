@@ -20,6 +20,19 @@ export const GameState = {
   // Interaction state
   nearbyNPCs: [],
   canInteract: false,
+  
+  // Methods
+  hasClue(clueId) {
+    return this.ownedClues.has(clueId);
+  },
+  
+  grantClue(clueId, metadata = {}) {
+    if (!this.ownedClues.has(clueId)) {
+      this.ownedClues.add(clueId);
+      return true;
+    }
+    return false;
+  }
 };
 
 /**
@@ -40,20 +53,20 @@ export function grantClue(clueId, clues) {
 }
 
 /**
- * Get all player clues
- * @returns {Array} - Array of owned clue IDs
- */
-export function getPlayerClues() {
-  return Array.from(GameState.ownedClues);
-}
-
-/**
  * Check if player has a specific clue
  * @param {string} clueId - The clue ID to check
  * @returns {boolean} - True if player has the clue
  */
 export function hasClue(clueId) {
   return GameState.ownedClues.has(clueId);
+}
+
+/**
+ * Get all player clues
+ * @returns {Array} - Array of owned clue IDs
+ */
+export function getPlayerClues() {
+  return Array.from(GameState.ownedClues);
 }
 
 /**
