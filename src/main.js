@@ -5,6 +5,7 @@ import { World } from './game/world.js';
 import { Player } from './game/player.js';
 import { GameState, resetForNewLevel, markGameComplete } from './game/game_state.js';
 import { DialogueSystem } from './game/dialogue.js';
+import { HUD } from './game/hud.js';
 import { loadLevel, levelExists } from './game/level_loader.js';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from './shared/constants.js';
 
@@ -24,6 +25,7 @@ const world = new World();
 const player = new Player(2, 2); // Default position, will be set by level data
 const renderer = new Renderer(canvas);
 const dialogueSystem = new DialogueSystem(canvas);
+const hud = new HUD();
 
 // Current level ID
 let currentLevelId = 'level_1';
@@ -131,6 +133,14 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'r' && (GameState.isLevelComplete || GameState.isGameComplete)) {
     console.log('🔄 Restart key pressed!');
     restartCurrentLevel();
+    e.preventDefault();
+    return;
+  }
+  
+  // Handle clues display toggle (only when not in dialogue)
+  if ((e.key === 'c' || e.key === 'C') && !GameState.isInDialogue) {
+    console.log('📋 Clues display toggled!');
+    hud.toggleClues();
     e.preventDefault();
     return;
   }
@@ -268,6 +278,9 @@ function update(dt) {
   // Update dialogue system
   dialogueSystem.update(dt);
   
+  // Update HUD with current clues
+  hud.updateClues(GameState.ownedClues, world.getClues());
+  
   // Sync text input buffer with dialogue system
   if (isDialogueInputActive && GameState.isInDialogue) {
     dialogueSystem.setPlayerInput(textInputBuffer);
@@ -287,6 +300,9 @@ function render() {
   if (!gameRunning) return;
   
   renderer.render(world, player, dialogueSystem, GameState, true);
+  
+  // Render HUD on top
+  hud.render(renderer.ctx, GameState);
 }
 
 // Initialize and start the game
