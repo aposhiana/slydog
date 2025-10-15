@@ -29,6 +29,7 @@ Create a new file in `/src/levels/` following the naming pattern `level_X.json`:
       "name": "Final Discovery",
       "description": "The final piece of the puzzle reveals the truth.",
       "hint": "Look for the final witness.",
+      "condition": "needs to ask about the final piece of evidence",
       "dependencies": []
     }
   },
@@ -63,6 +64,7 @@ Each clue in the `clues` object should have:
 - **name**: Display name for the clue
 - **description**: Full description revealed when clue is granted
 - **hint**: Hint shown when clue dependencies aren't met
+- **condition**: Instruction for what the player must say to get the clue
 - **dependencies**: Array of clue IDs that must be owned first
 
 ## Adding New NPCs
@@ -116,6 +118,26 @@ The game automatically progresses through levels based on the `next_level` field
 3. If yes: loads next level automatically
 4. If no: shows "Game Complete!" screen
 
+## Clue Conditions
+
+Each clue requires the player to say something specific to the NPC before they'll reveal it. The condition is analyzed by ChatGPT to determine if the player's message satisfies the requirement.
+
+### Condition Examples:
+```json
+"condition": "needs to ask about the train schedule or any delays"
+"condition": "needs to ask if she noticed anything unusual or suspicious"
+"condition": "needs to ask about security concerns or cargo safety"
+"condition": "needs to compliment them on their work"
+"condition": "needs to express concern about the investigation"
+```
+
+### How Conditions Work:
+1. Player talks to NPC and types a message
+2. If NPC has a clue and dependencies are met, ChatGPT analyzes the message
+3. ChatGPT determines if the message satisfies the condition
+4. If yes: NPC reveals the clue
+5. If no: NPC gives normal dialogue response
+
 ## Clue Dependencies
 
 Clues can have dependencies to create a logical progression:
@@ -130,6 +152,7 @@ The game validates that:
 - All dependencies exist
 - No circular dependencies
 - Dependencies are satisfied before granting clues
+- Conditions are checked after dependencies are met
 
 ## Train Layout Design
 
@@ -162,6 +185,9 @@ The game uses a train-like layout with:
 5. **Test Thoroughly**: Verify clue graph validation passes
 6. **Train Realism**: Place NPCs in seats or aisle positions
 7. **Seat Collisions**: Remember seats block movement
+8. **Condition Design**: Write conditions that are clear but not too obvious
+9. **Natural Language**: Conditions should feel like natural conversation prompts
+10. **Multiple Paths**: Allow different ways to satisfy conditions (e.g., "ask about delays" or "mention schedule")
 
 ## Example Level Sequence
 

@@ -23,6 +23,7 @@
       "name": "Conductor's Schedule",
       "description": "The conductor's schedule shows an unusual delay at the last stop. The train was held for 45 minutes due to 'cargo inspection'.",
       "hint": "Talk to the conductor to learn about the train schedule.",
+      "condition": "needs to ask about the train schedule or any delays",
       "dependencies": []
     },
     "clue_b": {
@@ -30,6 +31,7 @@
       "name": "Passenger's Observation",
       "description": "A passenger noticed someone suspicious getting off at the previous station carrying a large, heavy bag. They seemed nervous and kept looking around.",
       "hint": "Mrs. Johnson might have seen something interesting.",
+      "condition": "needs to ask if she noticed anything unusual or suspicious",
       "dependencies": ["clue_a"]
     },
     "clue_c": {
@@ -37,6 +39,7 @@
       "name": "Security Report",
       "description": "The security guard found evidence of tampering in the luggage car. Several locks were broken and some cargo appears to be missing.",
       "hint": "Officer Davis has important security information.",
+      "condition": "needs to ask about security concerns or cargo safety",
       "dependencies": ["clue_b"]
     }
   },

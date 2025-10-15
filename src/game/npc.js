@@ -150,4 +150,20 @@ export class NPC {
       return false;
     }
   }
+
+  // Check if the player's message satisfies this NPC's clue condition
+  async checkClueCondition(playerMessage, clues) {
+    if (!this.clueId) return false;
+    
+    try {
+      const { checkClueCondition } = await import('./clue_graph.js');
+      const clue = clues[this.clueId];
+      if (!clue) return false;
+      
+      return await checkClueCondition(clue, playerMessage, this.persona);
+    } catch (error) {
+      console.error('Error checking clue condition:', error);
+      return false;
+    }
+  }
 }

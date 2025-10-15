@@ -23,6 +23,11 @@ export function validateClueGraph(clues) {
       continue;
     }
     
+    if (!clue.condition) {
+      errors.push(`Clue ${clueId} is missing required 'condition' field`);
+      continue;
+    }
+    
     if (!Array.isArray(clue.dependencies)) {
       errors.push(`Clue ${clueId} has invalid 'dependencies' field (must be array)`);
       continue;
@@ -121,4 +126,44 @@ export function getClueHint(clueId, clues, ownedClues) {
   }
   
   return `You need to gather more information first. Missing: ${missingDeps.join(', ')}`;
+}
+
+/**
+ * Check if a player message satisfies a clue condition
+ * @param {Object} clue - The clue object
+ * @param {string} playerMessage - What the player said
+ * @param {string} npcPersona - The NPC's persona for context
+ * @returns {Promise<boolean>} - True if condition is satisfied
+ */
+export async function checkClueCondition(clue, playerMessage, npcPersona) {
+  try {
+    // Import the OpenAI client dynamically to avoid circular dependencies
+    const { sendChat } = await import('../ai/openai_client.js');
+    
+    const messages = [
+      {
+        role: "user",
+        content: `You are analyzing a conversation in a mystery game.
+
+NPC Persona: ${npcPersona}
+Clue Condition: ${clue.condition}
+
+Player Message: "${playerMessage}"
+
+Does the player's message satisfy the clue condition? The condition is an instruction about what the player needs to do or say to get this clue.
+
+Respond with only "YES" or "NO" - nothing else.`
+      }
+    ];
+
+    const response = await sendChat(messages);
+    const result = response.trim().toUpperCase();
+    
+    console.log(`🔍 Condition check for ${clue.id}: "${playerMessage}" -> ${result}`);
+    return result === 'YES';
+    
+  } catch (error) {
+    console.error('❌ Error checking clue condition:', error);
+    return false;
+  }
 }

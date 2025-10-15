@@ -123,22 +123,38 @@ document.addEventListener('keydown', (e) => {
           if (npc.hasClue()) {
             npc.canGrantClue(world.getClues(), GameState.ownedClues).then(canGrant => {
               if (canGrant) {
-                // Grant clue and get special response
-                npc.grantClue(world.getClues()).then(clueGranted => {
-                  if (clueGranted) {
-                    // Get clue-specific response first
-                    const clue = world.getClues()[npc.clueId];
-                    const clueResponse = `I have something important to tell you: ${clue.description}`;
-                    dialogueSystem.continueDialogue(clueResponse);
-                    
-                    // Mark that we should check for victory when dialogue ends
-                    GameState.shouldCheckVictoryOnDialogueEnd = true;
+                // Check if player message satisfies the clue condition
+                npc.checkClueCondition(message, world.getClues()).then(conditionMet => {
+                  if (conditionMet) {
+                    // Grant clue and get special response
+                    npc.grantClue(world.getClues()).then(clueGranted => {
+                      if (clueGranted) {
+                        // Get clue-specific response first
+                        const clue = world.getClues()[npc.clueId];
+                        const clueResponse = `I have something important to tell you: ${clue.description}`;
+                        dialogueSystem.continueDialogue(clueResponse);
+                        
+                        // Mark that we should check for victory when dialogue ends
+                        GameState.shouldCheckVictoryOnDialogueEnd = true;
+                      } else {
+                        // Normal dialogue
+                        npc.continueDialogue(message).then(response => {
+                          dialogueSystem.continueDialogue(response);
+                        });
+                      }
+                    });
                   } else {
-                    // Normal dialogue
+                    // Condition not met - normal dialogue with hint about condition
                     npc.continueDialogue(message).then(response => {
                       dialogueSystem.continueDialogue(response);
                     });
                   }
+                }).catch(error => {
+                  console.error('❌ Error checking condition:', error);
+                  // Fallback to normal dialogue on error
+                  npc.continueDialogue(message).then(response => {
+                    dialogueSystem.continueDialogue(response);
+                  });
                 });
               } else {
                 // Show hint for unavailable clue
