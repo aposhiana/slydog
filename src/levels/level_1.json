@@ -23,7 +23,7 @@
       "name": "Conductor's Schedule",
       "description": "The conductor's schedule shows an unusual delay at the last stop. The train was held for 45 minutes due to 'cargo inspection'.",
       "hint": "Talk to the conductor to learn about the train schedule.",
-      "condition": "needs to ask about the train schedule or any delays",
+      "conversation_lead": "The conductor is proud of punctuality but seems slightly embarrassed about recent delays. He might mention cargo inspections if asked about timing, schedules, or delays. Be helpful and steer the conversation toward schedule-related topics.",
       "dependencies": []
     },
     "clue_b": {
@@ -31,7 +31,7 @@
       "name": "Passenger's Observation",
       "description": "A passenger noticed someone suspicious getting off at the previous station carrying a large, heavy bag. They seemed nervous and kept looking around.",
       "hint": "Mrs. Johnson might have seen something interesting.",
-      "condition": "needs to ask if she noticed anything unusual or suspicious",
+      "conversation_lead": "Mrs. Johnson is a curious passenger who likes to people-watch. She seems eager to share observations if asked about other passengers, unusual behavior, or what she's noticed during the journey. Guide the conversation toward the person with the heavy bag she noticed.",
       "dependencies": ["clue_a"]
     },
     "clue_c": {
@@ -39,7 +39,7 @@
       "name": "Security Report",
       "description": "The security guard found evidence of tampering in the luggage car. Several locks were broken and some cargo appears to be missing.",
       "hint": "Officer Davis has important security information.",
-      "condition": "needs to ask about security concerns or cargo safety",
+      "conversation_lead": "Officer Davis is concerned about recent security issues but professional about it. He might discuss cargo safety, security concerns, or luggage car problems if asked about safety, security, or cargo. Steer conversations toward security topics.",
       "dependencies": ["clue_b"]
     }
   },

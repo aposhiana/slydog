@@ -54,6 +54,34 @@ async function initializeLevel(levelId) {
   }
 }
 
+// Handle function calls from ChatGPT
+async function handleFunctionCalls(toolCalls, npc) {
+  const { grantClue } = await import('./src/game/game_functions.js');
+  
+  for (const toolCall of toolCalls) {
+    if (toolCall.function.name === 'grantClue') {
+      try {
+        const args = JSON.parse(toolCall.function.arguments);
+        const result = grantClue(args.clueId, args.reason);
+        
+        if (result.success) {
+          console.log(`✅ Clue granted: ${args.clueId} - ${args.reason}`);
+          
+          // Check if this was the final clue
+          world.checkLevelComplete(GameState.ownedClues);
+          if (world.checkLevelComplete(GameState.ownedClues)) {
+            GameState.shouldCheckVictoryOnDialogueEnd = true;
+          }
+        } else {
+          console.log(`❌ Failed to grant clue: ${result.message}`);
+        }
+      } catch (error) {
+        console.error('❌ Error executing grantClue function:', error);
+      }
+    }
+  }
+}
+
 // Handle level completion and progression
 async function handleLevelCompletion() {
   // Check if current level is complete
@@ -119,63 +147,19 @@ document.addEventListener('keydown', (e) => {
         if (dialogueSystem.currentNPC) {
           const npc = dialogueSystem.currentNPC;
           
-          // Check if NPC has a clue to grant
-          if (npc.hasClue()) {
-            npc.canGrantClue(world.getClues(), GameState.ownedClues).then(canGrant => {
-              if (canGrant) {
-                // Check if player message satisfies the clue condition
-                npc.checkClueCondition(message, world.getClues()).then(conditionMet => {
-                  if (conditionMet) {
-                    // Grant clue and get special response
-                    npc.grantClue(world.getClues()).then(clueGranted => {
-                      if (clueGranted) {
-                        // Get clue-specific response first
-                        const clue = world.getClues()[npc.clueId];
-                        const clueResponse = `I have something important to tell you: ${clue.description}`;
-                        dialogueSystem.continueDialogue(clueResponse);
-                        
-                        // Mark that we should check for victory when dialogue ends
-                        GameState.shouldCheckVictoryOnDialogueEnd = true;
-                      } else {
-                        // Normal dialogue
-                        npc.continueDialogue(message).then(response => {
-                          dialogueSystem.continueDialogue(response);
-                        });
-                      }
-                    });
-                  } else {
-                    // Condition not met - normal dialogue with hint about condition
-                    npc.continueDialogue(message).then(response => {
-                      dialogueSystem.continueDialogue(response);
-                    });
-                  }
-                }).catch(error => {
-                  console.error('❌ Error checking condition:', error);
-                  // Fallback to normal dialogue on error
-                  npc.continueDialogue(message).then(response => {
-                    dialogueSystem.continueDialogue(response);
-                  });
-                });
-              } else {
-                // Show hint for unavailable clue
-                npc.getClueHint(world.getClues(), GameState.ownedClues).then(hint => {
-                  if (hint) {
-                    dialogueSystem.continueDialogue(hint);
-                  } else {
-                    // Normal dialogue
-                    npc.continueDialogue(message).then(response => {
-                      dialogueSystem.continueDialogue(response);
-                    });
-                  }
-                });
-              }
-            });
-          } else {
-            // Normal dialogue for NPCs without clues
-            npc.continueDialogue(message).then(response => {
-              dialogueSystem.continueDialogue(response);
-            });
-          }
+          // Use function calling for dialogue
+          npc.continueDialogue(message, world.getClues(), GameState.ownedClues).then(response => {
+            // Display the NPC's response
+            dialogueSystem.continueDialogue(response.content);
+            
+            // Handle any function calls
+            if (response.tool_calls && response.tool_calls.length > 0) {
+              handleFunctionCalls(response.tool_calls, npc);
+            }
+          }).catch(error => {
+            console.error('❌ Error in dialogue:', error);
+            dialogueSystem.continueDialogue("I'm having trouble responding right now.");
+          });
         }
       }
       e.preventDefault();
@@ -267,8 +251,13 @@ function update(dt) {
       GameState.isInDialogue = true;
       
       // Start dialogue
-      npc.startDialogue().then(response => {
-        dialogueSystem.startDialogue(npc, response);
+      npc.startDialogue('', world.getClues(), GameState.ownedClues).then(response => {
+        dialogueSystem.startDialogue(npc, response.content);
+        
+        // Handle any function calls
+        if (response.tool_calls && response.tool_calls.length > 0) {
+          handleFunctionCalls(response.tool_calls, npc);
+        }
       });
     }
   }

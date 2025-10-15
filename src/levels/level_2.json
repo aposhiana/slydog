@@ -23,7 +23,7 @@
       "name": "Detective's Findings",
       "description": "The railway inspector has discovered that the stolen cargo contained rare artifacts. The theft was well-planned and coordinated.",
       "hint": "Detective Martinez has been investigating this case for weeks.",
-      "condition": "needs to ask about the investigation or what he has discovered",
+      "conversation_lead": "Detective Martinez is eager to discuss his investigation findings. He seems proud of his work and will share details if asked about the case, investigation progress, or what he's discovered. Guide conversations toward investigative topics.",
       "dependencies": []
     },
     "clue_e": {
@@ -31,7 +31,7 @@
       "name": "Engineer's Discovery",
       "description": "The train's engineer found evidence that someone tampered with the locomotive's systems to ensure the delay at the last station.",
       "hint": "Engineer Williams knows every mechanical detail of this train.",
-      "condition": "needs to ask about any mechanical problems or system tampering",
+      "conversation_lead": "Engineer Williams is concerned about mechanical issues but knowledgeable about the train's systems. He might discuss tampering, mechanical problems, or system malfunctions if asked about the train's operation, delays, or technical issues. Steer toward technical discussions.",
       "dependencies": ["clue_d"]
     }
   },

@@ -23,8 +23,8 @@ export function validateClueGraph(clues) {
       continue;
     }
     
-    if (!clue.condition) {
-      errors.push(`Clue ${clueId} is missing required 'condition' field`);
+    if (!clue.conversation_lead) {
+      errors.push(`Clue ${clueId} is missing required 'conversation_lead' field`);
       continue;
     }
     

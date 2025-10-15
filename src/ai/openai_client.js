@@ -10,6 +10,8 @@ export async function sendChat(messages, opts = {}) {
         model: "gpt-4o-mini",
         messages,
         max_tokens: opts.max_tokens ?? 256,
+        tools: opts.tools || undefined,
+        tool_choice: opts.tool_choice || undefined,
       }),
     });
 
@@ -19,9 +21,18 @@ export async function sendChat(messages, opts = {}) {
     }
 
     const data = await response.json();
-    return data?.choices?.[0]?.message?.content ?? "";
+    const message = data?.choices?.[0]?.message;
+    
+    // Return both content and function calls if present
+    return {
+      content: message?.content ?? "",
+      tool_calls: message?.tool_calls || []
+    };
   } catch (err) {
     console.error("OpenAI client error:", err);
-    return "(NPC is silent — communication error.)";
+    return {
+      content: "(NPC is silent — communication error.)",
+      tool_calls: []
+    };
   }
 }

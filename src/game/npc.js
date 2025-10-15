@@ -52,7 +52,7 @@ export class NPC {
   }
 
   // Start dialogue with this NPC
-  async startDialogue(playerMessage = '') {
+  async startDialogue(playerMessage = '', clues = {}, ownedClues = new Set()) {
     this.isTalking = true;
     
     const messages = [
@@ -69,19 +69,44 @@ export class NPC {
     try {
       // Import sendChat dynamically to avoid circular imports
       const { sendChat } = await import('../ai/openai_client.js');
-      this.currentDialogue = await sendChat(messages);
+      const { GAME_FUNCTIONS, getAvailableCluesForNPC } = await import('./game_functions.js');
+      
+      // Get available clues for this NPC
+      const availableClues = getAvailableCluesForNPC(clues, ownedClues, this.clueId);
+      
+      // Add context about available clues
+      if (availableClues.length > 0) {
+        const clueContext = availableClues.map(clue => 
+          `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}`
+        ).join('\n');
+        
+        messages[0].content += `\n\nYou have access to these clues that you can reveal. Use the conversation guidance to help steer the conversation naturally toward these topics:\n${clueContext}\n\nBe helpful and proactive in guiding the conversation. Don't wait for exact phrases - use the guidance to steer toward relevant topics and reveal clues when appropriate.`;
+      }
+      
+      const response = await sendChat(messages, {
+        tools: availableClues.length > 0 ? GAME_FUNCTIONS : undefined,
+        tool_choice: availableClues.length > 0 ? "auto" : undefined
+      });
+      
+      this.currentDialogue = response.content;
+      this.lastToolCalls = response.tool_calls;
+      
     } catch (error) {
       console.error('Dialogue error:', error);
       this.currentDialogue = "Sorry, I can't talk right now.";
+      this.lastToolCalls = [];
     }
     
-    return this.currentDialogue;
+    return {
+      content: this.currentDialogue,
+      tool_calls: this.lastToolCalls || []
+    };
   }
 
   // Continue dialogue with a response
-  async continueDialogue(playerMessage) {
+  async continueDialogue(playerMessage, clues = {}, ownedClues = new Set()) {
     if (!this.isTalking) {
-      return await this.startDialogue(playerMessage);
+      return await this.startDialogue(playerMessage, clues, ownedClues);
     }
     
     const messages = [
@@ -92,13 +117,38 @@ export class NPC {
     
     try {
       const { sendChat } = await import('../ai/openai_client.js');
-      this.currentDialogue = await sendChat(messages);
+      const { GAME_FUNCTIONS, getAvailableCluesForNPC } = await import('./game_functions.js');
+      
+      // Get available clues for this NPC
+      const availableClues = getAvailableCluesForNPC(clues, ownedClues, this.clueId);
+      
+      // Add context about available clues
+      if (availableClues.length > 0) {
+        const clueContext = availableClues.map(clue => 
+          `- ${clue.id}: ${clue.description}\n  Conversation guidance: ${clue.conversation_lead}`
+        ).join('\n');
+        
+        messages[0].content += `\n\nYou have access to these clues that you can reveal. Use the conversation guidance to help steer the conversation naturally toward these topics:\n${clueContext}\n\nBe helpful and proactive in guiding the conversation. Don't wait for exact phrases - use the guidance to steer toward relevant topics and reveal clues when appropriate.`;
+      }
+      
+      const response = await sendChat(messages, {
+        tools: availableClues.length > 0 ? GAME_FUNCTIONS : undefined,
+        tool_choice: availableClues.length > 0 ? "auto" : undefined
+      });
+      
+      this.currentDialogue = response.content;
+      this.lastToolCalls = response.tool_calls;
+      
     } catch (error) {
       console.error('Dialogue error:', error);
       this.currentDialogue = "I'm having trouble responding right now.";
+      this.lastToolCalls = [];
     }
     
-    return this.currentDialogue;
+    return {
+      content: this.currentDialogue,
+      tool_calls: this.lastToolCalls || []
+    };
   }
 
   // End dialogue
@@ -151,19 +201,8 @@ export class NPC {
     }
   }
 
-  // Check if the player's message satisfies this NPC's clue condition
-  async checkClueCondition(playerMessage, clues) {
-    if (!this.clueId) return false;
-    
-    try {
-      const { checkClueCondition } = await import('./clue_graph.js');
-      const clue = clues[this.clueId];
-      if (!clue) return false;
-      
-      return await checkClueCondition(clue, playerMessage, this.persona);
-    } catch (error) {
-      console.error('Error checking clue condition:', error);
-      return false;
-    }
+  // Get the last tool calls from the NPC's response
+  getLastToolCalls() {
+    return this.lastToolCalls || [];
   }
 }
