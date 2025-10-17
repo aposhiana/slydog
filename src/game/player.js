@@ -1,5 +1,10 @@
 import { TILE_SIZE } from '../shared/constants.js';
 
+// 2.5D tile dimensions matching pygame implementation
+const TILE_WIDTH = 50;
+const TILE_HEIGHT = 85; 
+const TILE_FLOOR_HEIGHT = 40;
+
 // Player class handles position and movement
 export class Player {
   constructor(x, y) {
@@ -7,9 +12,9 @@ export class Player {
     this.gridX = x;
     this.gridY = y;
     
-    // Pixel position (for smooth animation)
-    this.pixelX = x * TILE_SIZE;
-    this.pixelY = y * TILE_SIZE;
+    // Pixel position (for smooth animation) - 2.5D positioning
+    this.pixelX = x * TILE_WIDTH;
+    this.pixelY = y * TILE_FLOOR_HEIGHT;
     
     // Target position for smooth movement
     this.targetX = this.pixelX;
@@ -74,9 +79,9 @@ export class Player {
       this.gridX = newGridX;
       this.gridY = newGridY;
       
-      // Set target pixel position
-      this.targetX = this.gridX * TILE_SIZE;
-      this.targetY = this.gridY * TILE_SIZE;
+      // Set target pixel position - 2.5D positioning
+      this.targetX = this.gridX * TILE_WIDTH;
+      this.targetY = this.gridY * TILE_FLOOR_HEIGHT;
       
       return true;
     }
@@ -104,8 +109,8 @@ export class Player {
   setPosition(x, y) {
     this.gridX = x;
     this.gridY = y;
-    this.pixelX = x * TILE_SIZE;
-    this.pixelY = y * TILE_SIZE;
+    this.pixelX = x * TILE_WIDTH;
+    this.pixelY = y * TILE_FLOOR_HEIGHT;
     this.targetX = this.pixelX;
     this.targetY = this.pixelY;
     this.isMoving = false;

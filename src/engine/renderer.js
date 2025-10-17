@@ -8,6 +8,11 @@ import {
   COLORS 
 } from '../shared/constants.js';
 
+// 2.5D tile dimensions matching pygame implementation
+const TILE_WIDTH = 50;
+const TILE_HEIGHT = 85; 
+const TILE_FLOOR_HEIGHT = 40;
+
 // Renderer class handles all drawing operations
 export class Renderer {
   constructor(canvas) {
@@ -21,6 +26,10 @@ export class Renderer {
     // Load floor tile image (2.5D styled)
     this.floorTileImage = new Image();
     this.floorTileImage.src = 'assets/tiles/floor_tile.png';
+    
+    // Load chair sprite for seats
+    this.chairSprite = new Image();
+    this.chairSprite.src = 'assets/tiles/chair_sprite.png';
 
     // Load dog sprites
     this.dogSprites = {
@@ -50,55 +59,64 @@ export class Renderer {
     this.cameraY = playerY - CANVAS_HEIGHT / 2;
   }
 
-  // Render the world tilemap
+  // Render the world tilemap with proper 2.5D layering (pygame-style)
   renderWorld(world) {
     const tilemap = world.getTilemap();
     
-    // Calculate which tiles are visible
-    const startX = Math.max(0, Math.floor(this.cameraX / TILE_SIZE));
-    const endX = Math.min(GRID_W, Math.ceil((this.cameraX + CANVAS_WIDTH) / TILE_SIZE));
-    const startY = Math.max(0, Math.floor(this.cameraY / TILE_SIZE));
-    const endY = Math.min(GRID_H, Math.ceil((this.cameraY + CANVAS_HEIGHT) / TILE_SIZE));
+    // Calculate which tiles are visible using 2.5D dimensions
+    const startX = Math.max(0, Math.floor(this.cameraX / TILE_WIDTH));
+    const endX = Math.min(GRID_W, Math.ceil((this.cameraX + CANVAS_WIDTH) / TILE_WIDTH));
+    const startY = Math.max(0, Math.floor(this.cameraY / TILE_FLOOR_HEIGHT));
+    const endY = Math.min(GRID_H, Math.ceil((this.cameraY + CANVAS_HEIGHT) / TILE_FLOOR_HEIGHT));
     
-    // Draw visible tiles
+    // Render from top to bottom for proper 2.5D layering
+    // This ensures upper tiles appear behind lower tiles
     for (let y = startY; y < endY; y++) {
       for (let x = startX; x < endX; x++) {
         const tileType = tilemap[y][x];
-        const screenX = x * TILE_SIZE - this.cameraX;
-        const screenY = y * TILE_SIZE - this.cameraY;
+        const screenX = x * TILE_WIDTH - this.cameraX;
+        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY; // Key: use TILE_FLOOR_HEIGHT for Y spacing
         
-        // Draw tile
         if (tileType === TILE_TYPES.FLOOR) {
           // Use floor texture if available; fallback to flat color
           if (this.floorTileImage && this.floorTileImage.complete && this.floorTileImage.naturalWidth > 0) {
-            this.ctx.drawImage(this.floorTileImage, screenX, screenY, TILE_SIZE, TILE_SIZE);
+            this.ctx.drawImage(this.floorTileImage, screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
           } else {
             this.ctx.fillStyle = COLORS.FLOOR;
-            this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+            this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
           }
         } else if (tileType === TILE_TYPES.WALL) {
           this.ctx.fillStyle = COLORS.WALL;
-          this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
         } else if (tileType === TILE_TYPES.SEAT) {
-          this.ctx.fillStyle = COLORS.SEAT;
-          this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          // Use chair sprite if available; fallback to colored rectangles
+          if (this.chairSprite && this.chairSprite.complete && this.chairSprite.naturalWidth > 0) {
+            this.ctx.drawImage(this.chairSprite, screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+          } else {
+            // Fallback: draw seat with colored rectangles
+            this.ctx.fillStyle = COLORS.SEAT;
+            this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+            
+            // Draw seat back
+            this.ctx.fillStyle = '#8B4513';
+            this.ctx.fillRect(screenX + 2, screenY + 2, TILE_WIDTH - 4, 8);
+            
+            // Draw seat base
+            this.ctx.fillStyle = '#654321';
+            this.ctx.fillRect(screenX + 2, screenY + 22, TILE_WIDTH - 4, 8);
+          }
         }
-        
-        // Draw seat details
-        if (tileType === TILE_TYPES.SEAT) {
-          // Draw seat back
-          this.ctx.fillStyle = '#8B4513';
-          this.ctx.fillRect(screenX + 2, screenY + 2, TILE_SIZE - 4, 8);
-          
-          // Draw seat base
-          this.ctx.fillStyle = '#654321';
-          this.ctx.fillRect(screenX + 2, screenY + 22, TILE_SIZE - 4, 8);
-        }
-        
-        // Draw tile border
-        this.ctx.strokeStyle = COLORS.GRID;
-        this.ctx.lineWidth = 1;
-        this.ctx.strokeRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+      }
+    }
+    
+    // Draw tile borders (debug grid) - optional
+    this.ctx.strokeStyle = COLORS.GRID;
+    this.ctx.lineWidth = 1;
+    for (let y = startY; y < endY; y++) {
+      for (let x = startX; x < endX; x++) {
+        const screenX = x * TILE_WIDTH - this.cameraX;
+        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY;
+        this.ctx.strokeRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
       }
     }
   }
@@ -120,12 +138,12 @@ export class Renderer {
       const aspect = spriteW > 0 ? (spriteH / spriteW) : 1;
 
       // Fit width to tile, compute height from aspect (allows taller than tile)
-      const drawW = TILE_SIZE;
+      const drawW = TILE_WIDTH;
       const drawH = Math.round(drawW * aspect);
 
       // Bottom-center align: feet at bottom of the tile
-      const drawX = screenX + Math.round((TILE_SIZE - drawW) / 2);
-      const drawY = screenY + (TILE_SIZE - drawH);
+      const drawX = screenX + Math.round((TILE_WIDTH - drawW) / 2);
+      const drawY = screenY + (TILE_HEIGHT - drawH);
 
       this.ctx.drawImage(sprite, drawX, drawY, drawW, drawH);
     } else {
@@ -133,9 +151,9 @@ export class Renderer {
       this.ctx.fillStyle = COLORS.PLAYER;
       this.ctx.beginPath();
       this.ctx.arc(
-        screenX + TILE_SIZE / 2, 
-        screenY + TILE_SIZE / 2, 
-        TILE_SIZE / 3, 
+        screenX + TILE_WIDTH / 2, 
+        screenY + TILE_HEIGHT / 2, 
+        TILE_WIDTH / 3, 
         0, 
         Math.PI * 2
       );
@@ -158,20 +176,20 @@ export class Renderer {
       // Draw NPC as a colored square
       this.ctx.fillStyle = npc.color;
       this.ctx.fillRect(
-        screenX + TILE_SIZE * 0.2, 
-        screenY + TILE_SIZE * 0.2, 
-        TILE_SIZE * 0.6, 
-        TILE_SIZE * 0.6
+        screenX + TILE_WIDTH * 0.2, 
+        screenY + TILE_HEIGHT * 0.2, 
+        TILE_WIDTH * 0.6, 
+        TILE_HEIGHT * 0.6
       );
       
       // Draw NPC border
       this.ctx.strokeStyle = '#ffffff';
       this.ctx.lineWidth = 2;
       this.ctx.strokeRect(
-        screenX + TILE_SIZE * 0.2, 
-        screenY + TILE_SIZE * 0.2, 
-        TILE_SIZE * 0.6, 
-        TILE_SIZE * 0.6
+        screenX + TILE_WIDTH * 0.2, 
+        screenY + TILE_HEIGHT * 0.2, 
+        TILE_WIDTH * 0.6, 
+        TILE_HEIGHT * 0.6
       );
       
       // Draw NPC name above them
