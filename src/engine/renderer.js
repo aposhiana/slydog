@@ -17,6 +17,20 @@ export class Renderer {
     // Camera offset for centering on player
     this.cameraX = 0;
     this.cameraY = 0;
+    
+    // Load dog sprites
+    this.dogSprites = {
+      front: new Image(),
+      back: new Image(),
+      left: new Image(),
+      right: new Image()
+    };
+    
+    // Set sprite sources
+    this.dogSprites.front.src = 'assets/sprites/dogspriteback.png';
+    this.dogSprites.back.src = 'assets/sprites/dogspritefront.png';
+    this.dogSprites.left.src = 'assets/sprites/dogspriteleft.png';
+    this.dogSprites.right.src = 'assets/sprites/dogspriteright.png';
   }
 
   // Clear the canvas
@@ -85,22 +99,30 @@ export class Renderer {
     const screenX = pos.x - this.cameraX;
     const screenY = pos.y - this.cameraY;
     
-    // Draw player as a circle
-    this.ctx.fillStyle = COLORS.PLAYER;
-    this.ctx.beginPath();
-    this.ctx.arc(
-      screenX + TILE_SIZE / 2, 
-      screenY + TILE_SIZE / 2, 
-      TILE_SIZE / 3, 
-      0, 
-      Math.PI * 2
-    );
-    this.ctx.fill();
+    // Get the appropriate dog sprite based on direction
+    const sprite = this.dogSprites[player.direction];
     
-    // Draw player border
-    this.ctx.strokeStyle = '#ffffff';
-    this.ctx.lineWidth = 2;
-    this.ctx.stroke();
+    // Draw dog sprite if loaded, otherwise fallback to circle
+    if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+      this.ctx.drawImage(sprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
+    } else {
+      // Fallback to circle while sprites are loading
+      this.ctx.fillStyle = COLORS.PLAYER;
+      this.ctx.beginPath();
+      this.ctx.arc(
+        screenX + TILE_SIZE / 2, 
+        screenY + TILE_SIZE / 2, 
+        TILE_SIZE / 3, 
+        0, 
+        Math.PI * 2
+      );
+      this.ctx.fill();
+      
+      // Draw player border
+      this.ctx.strokeStyle = '#ffffff';
+      this.ctx.lineWidth = 2;
+      this.ctx.stroke();
+    }
   }
 
   // Render NPCs

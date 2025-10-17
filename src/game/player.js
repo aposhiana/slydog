@@ -20,6 +20,9 @@ export class Player {
     
     // Whether the player is currently moving
     this.isMoving = false;
+    
+    // Direction the player is facing
+    this.direction = 'front'; // 'front', 'back', 'left', 'right'
   }
 
   // Update player position and animation
@@ -61,6 +64,12 @@ export class Player {
     
     // Check if the new position is valid
     if (world.isValidPosition(newGridX, newGridY)) {
+      // Set direction based on movement
+      if (dx > 0) this.direction = 'right';
+      else if (dx < 0) this.direction = 'left';
+      else if (dy > 0) this.direction = 'back';
+      else if (dy < 0) this.direction = 'front';
+      
       // Update grid position
       this.gridX = newGridX;
       this.gridY = newGridY;
