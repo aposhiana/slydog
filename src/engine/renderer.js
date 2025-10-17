@@ -18,6 +18,10 @@ export class Renderer {
     this.cameraX = 0;
     this.cameraY = 0;
     
+    // Load floor tile image (2.5D styled)
+    this.floorTileImage = new Image();
+    this.floorTileImage.src = 'assets/tiles/floor_tile.png';
+
     // Load dog sprites
     this.dogSprites = {
       front: new Image(),
@@ -65,14 +69,20 @@ export class Renderer {
         
         // Draw tile
         if (tileType === TILE_TYPES.FLOOR) {
-          this.ctx.fillStyle = COLORS.FLOOR;
+          // Use floor texture if available; fallback to flat color
+          if (this.floorTileImage && this.floorTileImage.complete && this.floorTileImage.naturalWidth > 0) {
+            this.ctx.drawImage(this.floorTileImage, screenX, screenY, TILE_SIZE, TILE_SIZE);
+          } else {
+            this.ctx.fillStyle = COLORS.FLOOR;
+            this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
+          }
         } else if (tileType === TILE_TYPES.WALL) {
           this.ctx.fillStyle = COLORS.WALL;
+          this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
         } else if (tileType === TILE_TYPES.SEAT) {
           this.ctx.fillStyle = COLORS.SEAT;
+          this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
         }
-        
-        this.ctx.fillRect(screenX, screenY, TILE_SIZE, TILE_SIZE);
         
         // Draw seat details
         if (tileType === TILE_TYPES.SEAT) {
@@ -104,7 +114,20 @@ export class Renderer {
     
     // Draw dog sprite if loaded, otherwise fallback to circle
     if (sprite && sprite.complete && sprite.naturalWidth > 0) {
-      this.ctx.drawImage(sprite, screenX, screenY, TILE_SIZE, TILE_SIZE);
+      // Preserve aspect ratio and anchor feet to the tile bottom (2.5D look)
+      const spriteW = sprite.naturalWidth;
+      const spriteH = sprite.naturalHeight;
+      const aspect = spriteW > 0 ? (spriteH / spriteW) : 1;
+
+      // Fit width to tile, compute height from aspect (allows taller than tile)
+      const drawW = TILE_SIZE;
+      const drawH = Math.round(drawW * aspect);
+
+      // Bottom-center align: feet at bottom of the tile
+      const drawX = screenX + Math.round((TILE_SIZE - drawW) / 2);
+      const drawY = screenY + (TILE_SIZE - drawH);
+
+      this.ctx.drawImage(sprite, drawX, drawY, drawW, drawH);
     } else {
       // Fallback to circle while sprites are loading
       this.ctx.fillStyle = COLORS.PLAYER;
