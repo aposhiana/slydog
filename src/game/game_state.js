@@ -119,7 +119,6 @@ export function resetForNewLevel(levelData) {
   GameState.playerPos.y = levelData.player_start[1];
   
   console.log(`✅ Game state reset for ${levelData.name}`);
-  console.log(`📍 Player start position: (${GameState.playerPos.x}, ${GameState.playerPos.y})`);
 }
 
 /**
