@@ -1,7 +1,7 @@
 {
   "id": "level_2",
-  "name": "The Investigation Continues",
-  "description": "The mystery deepens. More clues await on this new section of the train.",
+  "name": "The Cosmic Conspiracy",
+  "description": "The stardust theft was just the beginning. A deeper conspiracy involving intergalactic smugglers has been uncovered. Investigate further to expose the truth.",
   "next_level": null,
   "tilemap": [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -20,50 +20,55 @@
   "clues": {
     "clue_d": {
       "id": "clue_d",
-      "name": "Detective's Findings",
-      "description": "The railway inspector has discovered that the stolen cargo contained rare artifacts. The theft was well-planned and coordinated.",
-      "hint": "Detective Martinez has been investigating this case for weeks.",
-      "conversation_lead": "Detective Martinez is eager to discuss his investigation findings. He seems proud of his work and will share details if asked about the case, investigation progress, or what he's discovered. Guide conversations toward investigative topics.",
+      "name": "Smuggler's Network",
+      "description": "Agent Shadow has uncovered evidence of a vast intergalactic smuggling operation. The stardust theft was just one small part of a much larger criminal enterprise.",
+      "hint": "Agent Shadow has been investigating this case for months.",
+      "conversation_lead": "Agent Shadow is eager to discuss his investigation findings but speaks in hushed tones. He might share classified information about criminal networks, smuggling operations, or ongoing investigations if asked about his work, classified matters, or what he's discovered. Guide conversations toward investigative topics.",
       "dependencies": []
     },
     "clue_e": {
       "id": "clue_e",
-      "name": "Engineer's Discovery",
-      "description": "The train's engineer found evidence that someone tampered with the locomotive's systems to ensure the delay at the last station.",
-      "hint": "Engineer Williams knows every mechanical detail of this train.",
-      "conversation_lead": "Engineer Williams is concerned about mechanical issues but knowledgeable about the train's systems. He might discuss tampering, mechanical problems, or system malfunctions if asked about the train's operation, delays, or technical issues. Steer toward technical discussions.",
+      "name": "System Sabotage",
+      "description": "Circuit-7 discovered that the space train's navigation systems were deliberately tampered with to create a longer stop at the previous station, giving the smugglers more time to operate.",
+      "hint": "Circuit-7 has been analyzing the ship's systems for malfunctions.",
+      "conversation_lead": "Circuit-7 is concerned about system malfunctions and has been running diagnostics. He might discuss navigation problems, system tampering, or technical sabotage if asked about ship systems, navigation issues, or technical problems. Steer toward technical discussions.",
       "dependencies": ["clue_d"]
     }
   },
   "npcs": [
     {
-      "character_id": "inspector",
-      "position": [7, 5],
+      "character_id": "trenchcoat",
+      "position": [7, 2],
       "clue_id": "clue_d"
     },
     {
-      "character_id": "engineer",
-      "position": [22, 8],
+      "character_id": "robot",
+      "position": [22, 2],
       "clue_id": "clue_e"
     },
     {
-      "character_id": "conductor",
-      "position": [15, 3],
+      "character_id": "monster",
+      "position": [15, 2],
       "clue_id": null
     },
     {
-      "character_id": "passenger1",
-      "position": [10, 2],
+      "character_id": "girl",
+      "position": [10, 5],
       "clue_id": null
     },
     {
-      "character_id": "passenger2",
-      "position": [18, 6],
+      "character_id": "trenchcoat",
+      "position": [18, 5],
       "clue_id": null
     },
     {
-      "character_id": "passenger3",
-      "position": [25, 8],
+      "character_id": "robot",
+      "position": [25, 5],
+      "clue_id": null
+    },
+    {
+      "character_id": "nervous",
+      "position": [12, 2],
       "clue_id": null
     }
   ],

@@ -1,19 +1,25 @@
 import { TILE_SIZE } from '../shared/constants.js';
 
+// 2.5D tile dimensions matching pygame implementation
+const TILE_WIDTH = 50;
+const TILE_HEIGHT = 85; 
+const TILE_FLOOR_HEIGHT = 40;
+
 // NPC class for non-player characters
 export class NPC {
-  constructor(id, x, y, color, name, persona, clueId = null) {
+  constructor(id, x, y, color, name, persona, clueId = null, characterId = null) {
     this.id = id;
+    this.characterId = characterId || id; // For sprite lookup
     this.gridX = x;
     this.gridY = y;
-    this.pixelX = x * TILE_SIZE;
-    this.pixelY = y * TILE_SIZE;
+    this.pixelX = x * TILE_WIDTH;
+    this.pixelY = y * TILE_FLOOR_HEIGHT;
     
     // Visual properties
     this.color = color;
     this.name = name;
     this.persona = persona;
-    this.size = TILE_SIZE * 0.6; // Slightly smaller than player
+    this.size = TILE_WIDTH * 0.6; // Slightly smaller than player
     
     // Clue system
     this.clueId = clueId; // Optional clue this NPC can provide
