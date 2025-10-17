@@ -317,6 +317,7 @@ function update(dt) {
     } else if (input.isKeyPressed('KeyA') || input.isKeyPressed('ArrowLeft')) {
       dx = -1;
     } else if (input.isKeyPressed('KeyD') || input.isKeyPressed('ArrowRight')) {
+      // test comment
       dx = 1;
     }
     
