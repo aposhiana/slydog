@@ -109,16 +109,7 @@ export class Renderer {
       }
     }
     
-    // Draw tile borders (debug grid) - optional
-    this.ctx.strokeStyle = COLORS.GRID;
-    this.ctx.lineWidth = 1;
-    for (let y = startY; y < endY; y++) {
-      for (let x = startX; x < endX; x++) {
-        const screenX = x * TILE_WIDTH - this.cameraX;
-        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY;
-        this.ctx.strokeRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
-      }
-    }
+    // Debug grid removed for cleaner 2.5D look
   }
 
   // Render the player
