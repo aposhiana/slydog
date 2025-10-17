@@ -1,3 +1,5 @@
+Go to https://slydog.pages.dev/ to play the game
+
 ## ⚙️ Setup & Deployment
 
 ### 1. **Install dependencies**
