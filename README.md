@@ -22,52 +22,167 @@ Characters live in `src/npc_characters/`. Create a new file like `src/npc_charac
 {
   "name": "Inspector Gray",
   "color": "#555555",
-  "persona": "a meticulous investigator who speaks succinctly"
+  "persona": "a meticulous investigator who speaks succinctly",
+  "sprite": "inspector_sprite.png"
 }
 ```
 
-- name: Display name in dialogue
-- color: The NPC’s sprite color
-- persona: Guides the NPC’s tone and behavior in the system prompt
+**Required fields:**
+- `name`: Display name in dialogue
+- `color`: Hex color for fallback rendering (when sprite isn't loaded)
+- `persona`: Guides the NPC's tone and behavior in the system prompt
+- `sprite`: Filename of the sprite image (must be in `assets/sprites/`)
 
-Use the `character_id` to reference this file from your level’s `npcs` array (e.g., `"character_id": "inspector"` for `inspector.json`).
+**Adding the sprite asset:**
+1. Add your sprite image to `assets/sprites/` (e.g., `inspector_sprite.png`)
+2. Update the renderer to load your sprite by adding it to the `npcSprites` object in `src/engine/renderer.js`:
+
+```javascript
+// In the constructor, add to npcSprites object:
+this.npcSprites = {
+  monster: new Image(),
+  girl: new Image(),
+  trenchcoat: new Image(),
+  robot: new Image(),
+  nervous: new Image(),
+  inspector: new Image()  // Add your new character
+};
+
+// Set the sprite source:
+this.npcSprites.inspector.src = 'assets/sprites/inspector_sprite.png';
+```
+
+Use the `character_id` to reference this file from your level's `npcs` array (e.g., `"character_id": "inspector"` for `inspector.json`).
+
+### 1.1) Managing Sprite Assets
+
+**Asset Organization:**
+- All character sprites go in `assets/sprites/`
+- Sprite files should be PNG format for transparency support
+- Recommended naming: `{character_id}_sprite.png` (e.g., `inspector_sprite.png`)
+
+**Sprite Requirements:**
+- **Size**: Sprites are automatically scaled to fit tile width (50px) while preserving aspect ratio
+- **Aspect Ratio**: Can be taller than tiles for 2.5D effect (feet will be anchored to tile bottom)
+- **Transparency**: Use PNG with transparent background for clean integration
+- **Style**: Match the existing 2.5D pixel art style for consistency
+
+**Current Available Sprites:**
+- `monster_sprite.png` - Zorblax the Monster
+- `girl_sprite.png` - Luna Stardust  
+- `trenchcoat_sprite.png` - Mysterious Trenchcoat Figure
+- `robot_sprite.png` - Circuit-7
+- `nervous_sprite.png` - Nervous Norman
+
+**Fallback Rendering:**
+If a sprite fails to load, the game will display a colored rectangle using the character's `color` field as a fallback.
+
+### 1.2) Updating the Renderer for New Sprites
+
+When adding a new character with a sprite, you need to update the renderer to load the sprite:
+
+**File:** `src/engine/renderer.js`
+
+**Step 1: Add to npcSprites object (in constructor):**
+```javascript
+// Find the npcSprites object in the constructor
+this.npcSprites = {
+  monster: new Image(),
+  girl: new Image(),
+  trenchcoat: new Image(),
+  robot: new Image(),
+  nervous: new Image(),
+  your_new_character: new Image()  // Add this line
+};
+```
+
+**Step 2: Set the sprite source (in constructor):**
+```javascript
+// Find where sprite sources are set
+this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
+this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
+this.npcSprites.trenchcoat.src = 'assets/sprites/trenchcoat_sprite.png';
+this.npcSprites.robot.src = 'assets/sprites/robot_sprite.png';
+this.npcSprites.nervous.src = 'assets/sprites/nervous_sprite.png';
+this.npcSprites.your_new_character.src = 'assets/sprites/your_new_character_sprite.png'; // Add this line
+```
+
+**Important Notes:**
+- The `character_id` in your character JSON must match the key in `npcSprites`
+- The sprite filename in the character JSON must match the actual file in `assets/sprites/`
+- The renderer automatically handles scaling and positioning - no additional code needed
+- Sprites are loaded asynchronously, so there may be a brief fallback display while loading
 
 ### 2) Create a new level
 
-Levels live in `src/levels/` as `level_1.json`, `level_2.json`, etc. Copy an existing file and update it. A minimal level looks like this:
+Levels live in `src/levels/` as `level_1.json`, `level_2.json`, etc. Copy an existing file and update it. A complete level structure looks like this:
 
 ```json
 {
-  "name": "Car A",
-  "player_start": [2, 5],
-  "npcs": [
-    { "character_id": "conductor", "position": [8, 5], "clue_id": "timetable" },
-    { "character_id": "passenger", "position": [14, 5], "clue_id": "alibi" }
+  "id": "level_3",
+  "name": "The Final Investigation",
+  "description": "The mystery reaches its climax. Find the final clues.",
+  "next_level": null,
+  "tilemap": [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
   ],
+  "required_clues": ["clue_f", "clue_g"],
   "clues": {
-    "timetable": {
-      "description": "The train was delayed 15 minutes before departure.",
-      "conversation_lead": "If asked about schedule or timing, mention the pre-departure delay.",
+    "clue_f": {
+      "id": "clue_f",
+      "name": "Final Discovery",
+      "description": "The final piece of the puzzle reveals the truth.",
+      "hint": "Look for the final witness.",
+      "conversation_lead": "If asked about the final piece of evidence, mention the crucial discovery.",
       "dependencies": []
-    },
-    "alibi": {
-      "description": "The passenger was in Car B at departure.",
-      "conversation_lead": "If asked about where they were, share their location at departure.",
-      "dependencies": ["timetable"]
     }
-  }
+  },
+  "npcs": [
+    {
+      "character_id": "witness",
+      "position": [10, 5],
+      "clue_id": "clue_f"
+    }
+  ],
+  "player_start": [2, 5]
 }
 ```
 
-Key fields:
-- player_start: grid coords `[x, y]`
-- npcs: array with `character_id`, `position`, optional `clue_id`
-- clues: a graph of clues, each with:
-  - description: what to say when the clue is revealed
-  - conversation_lead: hint for the AI on when/how to offer the clue
-  - dependencies: list of clue IDs required beforehand
+**Key fields:**
+- `id`: Unique level identifier (e.g., "level_3")
+- `name`: Display name for the level
+- `description`: Brief description of the level's mystery
+- `next_level`: ID of next level (null for final level)
+- `tilemap`: 32x11 grid where 0=floor, 1=wall, 2=seat
+- `required_clues`: Array of clue IDs needed to complete the level
+- `player_start`: Starting position [x, y] for the player
+- `npcs`: Array with `character_id`, `position`, optional `clue_id`
+- `clues`: A graph of clues, each with:
+  - `id`: Unique clue identifier
+  - `name`: Display name for the clue
+  - `description`: What to say when the clue is revealed
+  - `hint`: Hint shown when clue dependencies aren't met
+  - `conversation_lead`: Hint for the AI on when/how to offer the clue
+  - `dependencies`: List of clue IDs required beforehand
 
-Note: Available levels are returned by `getAvailableLevels()` in `src/game/level_loader.js`. Add your new `level_X` there to include it in progression.
+**Adding to level progression:**
+Available levels are returned by `getAvailableLevels()` in `src/game/level_loader.js`. Add your new `level_X` there to include it in progression:
+
+```javascript
+export async function getAvailableLevels() {
+  return ['level_1', 'level_2', 'level_3']; // Add your new level here
+}
+```
 
 ### 3) Create a new mystery
 
