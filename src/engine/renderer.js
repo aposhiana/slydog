@@ -31,6 +31,18 @@ export class Renderer {
     this.chairSprite = new Image();
     this.chairSprite.src = 'assets/tiles/chair_sprite.png';
 
+    // Load NPC sprites
+    this.npcSprites = {
+      monster: new Image(),
+      girl: new Image(),
+      trenchcoat: new Image(),
+      robot: new Image()
+    };
+    this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
+    this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
+    this.npcSprites.trenchcoat.src = 'assets/sprites/trenchcoat_sprite.png';
+    this.npcSprites.robot.src = 'assets/sprites/robot_sprite.png';
+
     // Load dog sprites
     this.dogSprites = {
       front: new Image(),
@@ -69,13 +81,12 @@ export class Renderer {
     const startY = Math.max(0, Math.floor(this.cameraY / TILE_FLOOR_HEIGHT));
     const endY = Math.min(GRID_H, Math.ceil((this.cameraY + CANVAS_HEIGHT) / TILE_FLOOR_HEIGHT));
     
-    // Render from top to bottom for proper 2.5D layering
-    // This ensures upper tiles appear behind lower tiles
+    // First pass: Render floor tiles and walls (background layer)
     for (let y = startY; y < endY; y++) {
       for (let x = startX; x < endX; x++) {
         const tileType = tilemap[y][x];
         const screenX = x * TILE_WIDTH - this.cameraX;
-        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY; // Key: use TILE_FLOOR_HEIGHT for Y spacing
+        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY;
         
         if (tileType === TILE_TYPES.FLOOR) {
           // Use floor texture if available; fallback to flat color
@@ -88,28 +99,72 @@ export class Renderer {
         } else if (tileType === TILE_TYPES.WALL) {
           this.ctx.fillStyle = COLORS.WALL;
           this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
-        } else if (tileType === TILE_TYPES.SEAT) {
-          // Use chair sprite if available; fallback to colored rectangles
-          if (this.chairSprite && this.chairSprite.complete && this.chairSprite.naturalWidth > 0) {
-            this.ctx.drawImage(this.chairSprite, screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
-          } else {
-            // Fallback: draw seat with colored rectangles
-            this.ctx.fillStyle = COLORS.SEAT;
-            this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
-            
-            // Draw seat back
-            this.ctx.fillStyle = '#8B4513';
-            this.ctx.fillRect(screenX + 2, screenY + 2, TILE_WIDTH - 4, 8);
-            
-            // Draw seat base
-            this.ctx.fillStyle = '#654321';
-            this.ctx.fillRect(screenX + 2, screenY + 22, TILE_WIDTH - 4, 8);
-          }
         }
       }
     }
     
     // Debug grid removed for cleaner 2.5D look
+  }
+
+
+  // Render seats with proper 2.5D layering based on player position
+  renderSeatsWithLayering(world, player) {
+    const tilemap = world.getTilemap();
+    const playerGridPos = player.getGridPosition();
+    
+    // Calculate which tiles are visible using 2.5D dimensions
+    const startX = Math.max(0, Math.floor(this.cameraX / TILE_WIDTH));
+    const endX = Math.min(GRID_W, Math.ceil((this.cameraX + CANVAS_WIDTH) / TILE_WIDTH));
+    const startY = Math.max(0, Math.floor(this.cameraY / TILE_FLOOR_HEIGHT));
+    const endY = Math.min(GRID_H, Math.ceil((this.cameraY + CANVAS_HEIGHT) / TILE_FLOOR_HEIGHT));
+    
+    // First pass: Render seats that are below or at the same level as the player
+    for (let y = startY; y <= playerGridPos.y; y++) {
+      for (let x = startX; x < endX; x++) {
+        const tileType = tilemap[y][x];
+        const screenX = x * TILE_WIDTH - this.cameraX;
+        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY;
+        
+        if (tileType === TILE_TYPES.SEAT) {
+          this.renderSeat(screenX, screenY);
+        }
+      }
+    }
+    
+    // Player will be rendered here (by the main render method)
+    
+    // Second pass: Render seats that are above the player
+    for (let y = playerGridPos.y + 1; y < endY; y++) {
+      for (let x = startX; x < endX; x++) {
+        const tileType = tilemap[y][x];
+        const screenX = x * TILE_WIDTH - this.cameraX;
+        const screenY = y * TILE_FLOOR_HEIGHT - this.cameraY;
+        
+        if (tileType === TILE_TYPES.SEAT) {
+          this.renderSeat(screenX, screenY);
+        }
+      }
+    }
+  }
+
+  // Helper method to render a single seat
+  renderSeat(screenX, screenY) {
+    // Use chair sprite if available; fallback to colored rectangles
+    if (this.chairSprite && this.chairSprite.complete && this.chairSprite.naturalWidth > 0) {
+      this.ctx.drawImage(this.chairSprite, screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+    } else {
+      // Fallback: draw seat with colored rectangles
+      this.ctx.fillStyle = COLORS.SEAT;
+      this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+      
+      // Draw seat back
+      this.ctx.fillStyle = '#8B4513';
+      this.ctx.fillRect(screenX + 2, screenY + 2, TILE_WIDTH - 4, 8);
+      
+      // Draw seat base
+      this.ctx.fillStyle = '#654321';
+      this.ctx.fillRect(screenX + 2, screenY + 22, TILE_WIDTH - 4, 8);
+    }
   }
 
   // Render the player
@@ -157,31 +212,53 @@ export class Renderer {
     }
   }
 
-  // Render NPCs
+  // Render NPCs with sprites
   renderNPCs(npcs) {
     npcs.forEach(npc => {
       const pos = npc.getPosition();
       const screenX = pos.x - this.cameraX;
       const screenY = pos.y - this.cameraY;
       
-      // Draw NPC as a colored square
-      this.ctx.fillStyle = npc.color;
-      this.ctx.fillRect(
-        screenX + TILE_WIDTH * 0.2, 
-        screenY + TILE_HEIGHT * 0.2, 
-        TILE_WIDTH * 0.6, 
-        TILE_HEIGHT * 0.6
-      );
+      // Get the appropriate sprite based on character_id
+      const characterId = npc.characterId || npc.id;
+      const sprite = this.npcSprites[characterId];
       
-      // Draw NPC border
-      this.ctx.strokeStyle = '#ffffff';
-      this.ctx.lineWidth = 2;
-      this.ctx.strokeRect(
-        screenX + TILE_WIDTH * 0.2, 
-        screenY + TILE_HEIGHT * 0.2, 
-        TILE_WIDTH * 0.6, 
-        TILE_HEIGHT * 0.6
-      );
+      // Draw NPC sprite if available, otherwise fallback to colored rectangle
+      if (sprite && sprite.complete && sprite.naturalWidth > 0) {
+        // Preserve aspect ratio and anchor to bottom of tile (2.5D look)
+        const spriteW = sprite.naturalWidth;
+        const spriteH = sprite.naturalHeight;
+        const aspect = spriteW > 0 ? (spriteH / spriteW) : 1;
+
+        // Fit width to tile, compute height from aspect (allows taller than tile)
+        const drawW = TILE_WIDTH;
+        const drawH = Math.round(drawW * aspect);
+
+        // Bottom-center align: feet at bottom of the tile
+        const drawX = screenX + Math.round((TILE_WIDTH - drawW) / 2);
+        const drawY = screenY + (TILE_HEIGHT - drawH);
+
+        this.ctx.drawImage(sprite, drawX, drawY, drawW, drawH);
+      } else {
+        // Fallback: draw NPC as a colored square
+        this.ctx.fillStyle = npc.color;
+        this.ctx.fillRect(
+          screenX + TILE_WIDTH * 0.2, 
+          screenY + TILE_HEIGHT * 0.2, 
+          TILE_WIDTH * 0.6, 
+          TILE_HEIGHT * 0.6
+        );
+        
+        // Draw NPC border
+        this.ctx.strokeStyle = '#ffffff';
+        this.ctx.lineWidth = 2;
+        this.ctx.strokeRect(
+          screenX + TILE_WIDTH * 0.2, 
+          screenY + TILE_HEIGHT * 0.2, 
+          TILE_WIDTH * 0.6, 
+          TILE_HEIGHT * 0.6
+        );
+      }
       
       // Draw NPC name above them
       this.ctx.fillStyle = npc.color;
@@ -189,7 +266,7 @@ export class Renderer {
       this.ctx.textAlign = 'center';
       this.ctx.fillText(
         npc.name, 
-        screenX + TILE_SIZE / 2, 
+        screenX + TILE_WIDTH / 2, 
         screenY - 5
       );
       this.ctx.textAlign = 'left'; // Reset alignment
@@ -230,6 +307,10 @@ export class Renderer {
     this.clear();
     this.updateCamera(player.pixelX, player.pixelY);
     this.renderWorld(world);
+    
+    // Render seats and objects with proper 2.5D layering
+    this.renderSeatsWithLayering(world, player);
+    
     this.renderNPCs(world.getNPCs());
     this.renderPlayer(player);
     this.renderInteractionIndicator(gameState.canInteract && !gameState.isInDialogue);

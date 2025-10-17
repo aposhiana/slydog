@@ -1,7 +1,7 @@
 {
   "id": "level_1",
-  "name": "The Mysterious Cargo",
-  "description": "Something unusual happened during the last stop. Investigate the train to find clues.",
+  "name": "The Missing Stardust Cargo",
+  "description": "A valuable shipment of stardust has gone missing from the space train's cargo hold. Investigate the passengers to find clues about what happened.",
   "next_level": "level_2",
   "tilemap": [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -20,63 +20,63 @@
   "clues": {
     "clue_a": {
       "id": "clue_a",
-      "name": "Conductor's Schedule",
-      "description": "The conductor's schedule shows an unusual delay at the last stop. The train was held for 45 minutes due to 'cargo inspection'.",
-      "hint": "Talk to the conductor to learn about the train schedule.",
-      "conversation_lead": "The conductor is proud of punctuality but seems slightly embarrassed about recent delays. He might mention cargo inspections if asked about timing, schedules, or delays. Be helpful and steer the conversation toward schedule-related topics.",
+      "name": "Cargo Hold Breach",
+      "description": "The cargo hold's security system was disabled during the last stop. Someone with high-level access codes bypassed the stardust containment field.",
+      "hint": "Circuit-7 knows all about the ship's systems.",
+      "conversation_lead": "Circuit-7 is very knowledgeable about the space train's technical systems. He might mention security protocols, cargo systems, or technical malfunctions if asked about ship operations, cargo safety, or system status. Guide conversations toward technical and security topics.",
       "dependencies": []
     },
     "clue_b": {
       "id": "clue_b",
-      "name": "Passenger's Observation",
-      "description": "A passenger noticed someone suspicious getting off at the previous station carrying a large, heavy bag. They seemed nervous and kept looking around.",
-      "hint": "Mrs. Johnson might have seen something interesting.",
-      "conversation_lead": "Mrs. Johnson is a curious passenger who likes to people-watch. She seems eager to share observations if asked about other passengers, unusual behavior, or what she's noticed during the journey. Guide the conversation toward the person with the heavy bag she noticed.",
+      "name": "Suspicious Passenger",
+      "description": "A passenger in a trenchcoat was seen near the cargo area during the last stop. They were carrying a glowing container and seemed very nervous.",
+      "hint": "Luna Stardust is very observant and might have noticed something.",
+      "conversation_lead": "Luna is a curious navigator trainee who pays attention to details. She might share observations about other passengers, unusual behavior, or suspicious activities if asked about what she's noticed, other passengers, or unusual events. Steer conversations toward her observations.",
       "dependencies": ["clue_a"]
     },
     "clue_c": {
       "id": "clue_c",
-      "name": "Security Report",
-      "description": "The security guard found evidence of tampering in the luggage car. Several locks were broken and some cargo appears to be missing.",
-      "hint": "Officer Davis has important security information.",
-      "conversation_lead": "Officer Davis is concerned about recent security issues but professional about it. He might discuss cargo safety, security concerns, or luggage car problems if asked about safety, security, or cargo. Steer conversations toward security topics.",
+      "name": "Stardust Sample",
+      "description": "A small amount of stardust was found scattered near the cargo hold entrance. The particles are still glowing, indicating recent tampering.",
+      "hint": "Zorblax the Monster loves collecting space rocks and might know about stardust.",
+      "conversation_lead": "Zorblax is fascinated by space materials and rocks. He might discuss stardust, space minerals, or unusual cosmic materials if asked about space rocks, cosmic phenomena, or rare materials. Guide conversations toward his knowledge of space materials.",
       "dependencies": ["clue_b"]
     }
   },
   "npcs": [
     {
-      "character_id": "conductor",
-      "position": [5, 3],
+      "character_id": "robot",
+      "position": [5, 2],
       "clue_id": "clue_a"
     },
     {
-      "character_id": "passenger",
-      "position": [15, 4],
+      "character_id": "girl",
+      "position": [15, 2],
       "clue_id": "clue_b"
     },
     {
-      "character_id": "chef",
-      "position": [25, 7],
-      "clue_id": null
-    },
-    {
-      "character_id": "guard",
-      "position": [20, 5],
+      "character_id": "monster",
+      "position": [25, 2],
       "clue_id": "clue_c"
     },
     {
-      "character_id": "passenger1",
-      "position": [8, 2],
+      "character_id": "trenchcoat",
+      "position": [8, 5],
       "clue_id": null
     },
     {
-      "character_id": "passenger2",
-      "position": [12, 6],
+      "character_id": "robot",
+      "position": [12, 5],
       "clue_id": null
     },
     {
-      "character_id": "passenger3",
-      "position": [18, 8],
+      "character_id": "girl",
+      "position": [18, 5],
+      "clue_id": null
+    },
+    {
+      "character_id": "monster",
+      "position": [22, 5],
       "clue_id": null
     }
   ],

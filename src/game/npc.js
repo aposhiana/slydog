@@ -7,8 +7,9 @@ const TILE_FLOOR_HEIGHT = 40;
 
 // NPC class for non-player characters
 export class NPC {
-  constructor(id, x, y, color, name, persona, clueId = null) {
+  constructor(id, x, y, color, name, persona, clueId = null, characterId = null) {
     this.id = id;
+    this.characterId = characterId || id; // For sprite lookup
     this.gridX = x;
     this.gridY = y;
     this.pixelX = x * TILE_WIDTH;
