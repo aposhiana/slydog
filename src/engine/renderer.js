@@ -36,12 +36,14 @@ export class Renderer {
       monster: new Image(),
       girl: new Image(),
       trenchcoat: new Image(),
-      robot: new Image()
+      robot: new Image(),
+      nervous: new Image()
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
     this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
     this.npcSprites.trenchcoat.src = 'assets/sprites/trenchcoat_sprite.png';
     this.npcSprites.robot.src = 'assets/sprites/robot_sprite.png';
+    this.npcSprites.nervous.src = 'assets/sprites/nervous_sprite.png';
 
     // Load dog sprites
     this.dogSprites = {

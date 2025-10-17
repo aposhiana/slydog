@@ -65,6 +65,11 @@
       "character_id": "robot",
       "position": [25, 5],
       "clue_id": null
+    },
+    {
+      "character_id": "nervous",
+      "position": [12, 2],
+      "clue_id": null
     }
   ],
   "player_start": [2, 5]
