@@ -7,7 +7,13 @@ class InputManager {
     this.textBuffer = '';
     this.isTextInputMode = false;
     this.textInputEvent = null;
+
+    this.MOVE_REPEAT_INITIAL_DELAY_MS = 200;
+    this.MOVE_REPEAT_INTERVAL_MS = 60;
     
+    this.currentHeldDirection = null; 
+    this.nextMovementRepeatAt = 0;
+
     this.setupEventListeners();
   }
 
@@ -22,6 +28,7 @@ class InputManager {
       if (!this.keys.has(e.code)) {
         this.keys.add(e.code);
         this.pressed.add(e.code);
+        this._maybeResetRepeatOnDirectionChange();
       }
       
       // Handle text input for dialogue
@@ -48,6 +55,7 @@ class InputManager {
       
       this.keys.delete(e.code);
       this.released.add(e.code);
+      this._maybeResetRepeatOnDirectionChange();
     });
   }
 
@@ -114,6 +122,35 @@ class InputManager {
     return { dx, dy };
   }
 
+    // New: Discrete step output with key-repeat while held.
+  // Call this each frame; it returns {dx, dy} when it’s time to move one tile, else {0,0}.
+  getMovementRepeatStep(now = performance.now()) {
+    const intended = this._getHeldDirection();
+
+    if (!intended) {
+      // Nothing held: clear repeat state
+      this.currentHeldDirection = null;
+      this.nextMovementRepeatAt = 0;
+      return { dx: 0, dy: 0 };
+    }
+
+    // If direction changed or just started holding, emit an immediate step
+    if (this.currentHeldDirection !== intended) {
+      this.currentHeldDirection = intended;
+      this.nextMovementRepeatAt = now + this.MOVE_REPEAT_INITIAL_DELAY_MS;
+      return this._directionToDelta(intended);
+    }
+
+    // Same direction is still held: emit on schedule
+    if (now >= this.nextMovementRepeatAt) {
+      this.nextMovementRepeatAt = now + this.MOVE_REPEAT_INTERVAL_MS;
+      return this._directionToDelta(intended);
+    }
+
+    // Not yet time for the next step
+    return { dx: 0, dy: 0 };
+  }
+
   // Check if interaction key (E) is pressed
   isInteractionPressed() {
     return this.isKeyPressed('KeyE');
@@ -148,6 +185,36 @@ class InputManager {
   update() {
     this.pressed.clear();
     this.released.clear();
+  }
+
+
+  _getHeldDirection() {
+    // Priority rule mirrors common grid games: vertical over horizontal, prevents diagonals.
+    if (this.isKeyDown('KeyW') || this.isKeyDown('ArrowUp'))    return 'up';
+    if (this.isKeyDown('KeyS') || this.isKeyDown('ArrowDown'))  return 'down';
+    if (this.isKeyDown('KeyA') || this.isKeyDown('ArrowLeft'))  return 'left';
+    if (this.isKeyDown('KeyD') || this.isKeyDown('ArrowRight')) return 'right';
+    return null;
+  }
+
+  _directionToDelta(direction) {
+    switch (direction) {
+      case 'up': return { dx: 0,  dy: -1 };
+      case 'down': return { dx: 0, dy: 1 };
+      case 'left': return { dx: -1, dy: 0 };
+      case 'right': return { dx: 1, dy: 0 };
+      default: return { dx: 0, dy: 0 };
+    }
+  }
+
+  _maybeResetRepeatOnDirectionChange() {
+    const intended = this._getHeldDirection();
+    if (intended !== this.currentHeldDirection) {
+      // I intentionally do not emit a step here.
+      // The step will be emitted on the next getMovementRepeatStep() call.
+      this.currentHeldDirection = null;
+      this.nextMovementRepeatAt = 0;
+    }
   }
 }
 
