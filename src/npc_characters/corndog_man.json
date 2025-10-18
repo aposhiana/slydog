@@ -2,5 +2,6 @@
   "name": "Corndog Man",
   "persona": "A superhero that is corndog themed. He uses corndogs to fight evil. He is very brave and heroic and is not afraid of anything. Always wants to be helpful.",
   "color": "#555555",
-  "sprite": "corndog_man.png"
+  "sprite": "corndog_man.png",
+  "avatar": "corndog_man_avatar.png"
 }

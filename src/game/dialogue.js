@@ -46,11 +46,12 @@ export class DialogueSystem {
   loadAvatars() {
     const avatarFiles = [
       'girl_avatar.png',
-      'moster_avatar.png', 
+      'monster_avatar.png', 
       'trenchcoat_avatar.png',
       'robot_avatar.png',
       'nervous_avatar.png',
-      'neighmys_avatar.png'
+      'neighmys_avatar.png',
+      'corndog_man_avatar.png'
     ];
     
     avatarFiles.forEach(filename => {
