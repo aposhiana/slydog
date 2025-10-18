@@ -30,6 +30,12 @@ export class Renderer {
     // Load chair sprite for seats
     this.chairSprite = new Image();
     this.chairSprite.src = 'assets/tiles/chair_sprite.png';
+    
+    // Load wall sprites for train borders
+    this.wallSpriteLeft = new Image();
+    this.wallSpriteLeft.src = 'assets/tiles/wallspriteleft.png';
+    this.wallSpriteRight = new Image();
+    this.wallSpriteRight.src = 'assets/tiles/wallspriteright.png';
 
     // Load NPC sprites
     this.npcSprites = {
@@ -111,8 +117,7 @@ export class Renderer {
             this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
           }
         } else if (tileType === TILE_TYPES.WALL) {
-          this.ctx.fillStyle = COLORS.WALL;
-          this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+          this.renderWallTile(screenX, screenY, x, y, tilemap);
         }
       }
     }
@@ -120,6 +125,45 @@ export class Renderer {
     // Debug grid removed for cleaner 2.5D look
   }
 
+  // Render wall tile with appropriate left/right sprite
+  renderWallTile(screenX, screenY, gridX, gridY, tilemap) {
+    // Determine which wall sprite to use based on position
+    // For top and bottom rows, alternate between left and right sprites
+    // For left and right edges, use left sprite for left edge, right sprite for right edge
+    
+    let useLeftSprite = true;
+    
+    // Check if this is a top or bottom row
+    const isTopRow = gridY === 0;
+    const isBottomRow = gridY === tilemap.length - 1;
+    const isLeftEdge = gridX === 0;
+    const isRightEdge = gridX === tilemap[0].length - 1;
+    
+    if (isTopRow || isBottomRow) {
+      // For top and bottom rows, alternate between left and right sprites
+      useLeftSprite = gridX % 2 === 0;
+    } else if (isLeftEdge) {
+      // Left edge always uses left sprite
+      useLeftSprite = true;
+    } else if (isRightEdge) {
+      // Right edge always uses right sprite
+      useLeftSprite = false;
+    } else {
+      // Default to left sprite for any other wall tiles
+      useLeftSprite = true;
+    }
+    
+    // Choose the appropriate sprite
+    const wallSprite = useLeftSprite ? this.wallSpriteLeft : this.wallSpriteRight;
+    
+    // Draw the wall sprite if available, otherwise fallback to solid color
+    if (wallSprite && wallSprite.complete && wallSprite.naturalWidth > 0) {
+      this.ctx.drawImage(wallSprite, screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+    } else {
+      this.ctx.fillStyle = COLORS.WALL;
+      this.ctx.fillRect(screenX, screenY, TILE_WIDTH, TILE_HEIGHT);
+    }
+  }
 
   // Render seats with proper 2.5D layering based on player position
   renderSeatsWithLayering(world, player) {
