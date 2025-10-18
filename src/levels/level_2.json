@@ -2,7 +2,7 @@
   "id": "level_2",
   "name": "The Cosmic Conspiracy",
   "description": "The stardust theft was just the beginning. A deeper conspiracy involving intergalactic smugglers has been uncovered. Investigate further to expose the truth.",
-  "next_level": null,
+  "next_level": level_666,
   "tilemap": [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
