@@ -38,8 +38,9 @@ export class Renderer {
       trenchcoat: new Image(),
       robot: new Image(),
       nervous: new Image(),
-      mort: new Image()
+      mort: new Image(),
       bug: new Image(),
+      corndog_man: new Image()
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
     this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
@@ -48,6 +49,7 @@ export class Renderer {
     this.npcSprites.nervous.src = 'assets/sprites/nervous_sprite.png';
     this.npcSprites.mort.src = 'assets/sprites/mort.png';
     this.npcSprites.bug.src = 'assets/sprites/bug_sprite.png';
+    this.npcSprites.corndog_man.src = 'assets/sprites/corndog_man.png';
 
     // Load dog sprites
     this.dogSprites = {
