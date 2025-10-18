@@ -73,9 +73,9 @@ export class HUD {
       }
       
       // Instructions
-      ctx.fillStyle = '#888';
+      ctx.fillStyle = '#fff';
       ctx.font = '12px Arial';
-      ctx.fillText('Press C to minimize', x + padding, y + boxHeight - 10);
+      ctx.fillText('Press C to minimize', x + padding, y + boxHeight - 5);
       
     } else {
       // Minimized view - show count only
@@ -97,9 +97,9 @@ export class HUD {
       ctx.fillText(countText, x + padding, y + 20);
       
       // Instructions
-      ctx.fillStyle = '#888';
+      ctx.fillStyle = '#fff';
       ctx.font = '12px Arial';
-      ctx.fillText('Press C to expand', x + padding, y + 35);
+      ctx.fillText('Press C to expand', x + padding, y + 45);
     }
   }
 }
