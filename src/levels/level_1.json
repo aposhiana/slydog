@@ -83,6 +83,11 @@
       "character_id": "nervous",
       "position": [28, 2],
       "clue_id": null
+    },
+    {
+      "character_id": "bug",
+      "position": [3, 1],
+      "clue_id": null
     }
   ],
   "player_start": [2, 5]
