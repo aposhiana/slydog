@@ -38,6 +38,7 @@ export class Renderer {
       trenchcoat: new Image(),
       robot: new Image(),
       nervous: new Image(),
+      mort: new Image()
       bug: new Image(),
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
@@ -45,6 +46,7 @@ export class Renderer {
     this.npcSprites.trenchcoat.src = 'assets/sprites/trenchcoat_sprite.png';
     this.npcSprites.robot.src = 'assets/sprites/robot_sprite.png';
     this.npcSprites.nervous.src = 'assets/sprites/nervous_sprite.png';
+    this.npcSprites.mort.src = 'assets/sprites/mort.png';
     this.npcSprites.bug.src = 'assets/sprites/bug_sprite.png';
 
     // Load dog sprites
