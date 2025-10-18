@@ -70,6 +70,11 @@
       "clue_id": null
     },
     {
+      "character_id": "aperturecore",
+      "position": [18, 2],
+      "clue_id": null
+    },
+    {
       "character_id": "mort",
       "position": [4, 8],
       "clue_id": null
