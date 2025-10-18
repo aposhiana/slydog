@@ -1,0 +1,84 @@
+{
+  "id": "level_3",
+  "name": "Where da bone at",
+  "description": "Our dog came onto the train with his prized bone. But after going to get it from it's hiding space, it dissapeared. Find who took the bone.",
+  "next_level": "level_666",
+  "tilemap": [
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],
+    [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+  ],
+  "required_clues": ["clue_1", "clue_2", "clue_3"],
+  "clues": {
+    "clue_1": {
+      "id": "clue_1",
+      "name": "Food shortage",
+      "description": "Circuit-7 checked the logs of the trains food stores and found that they are much lower than analysis expected.",
+      "hint": "Circuit-7 has been analyzing the shops cargo records.",
+      "conversation_lead": "Circuit-7 has been noticing some discrepencies in the ships cargo log, specifically the food stores. He might share that if you as him about cargo issues.",
+      "dependencies": []
+    },
+    "clue_2": {
+      "id": "clue_2",
+      "name": "Loud slurping",
+      "description": "Ashleigh was trying to take a nap, and was awoken by the sound of loud slurping at the back of the train, near the buffet.",
+      "hint": "Ashleigh judges everyone on the ship very harshly.",
+      "conversation_lead": "Ashleigh needs to get her beauty sleep, but can't because of annoying noises during the train ride. Steer towards asking her about herself and her feelings.",
+      "dependencies": ["clue_1"]
+    },
+     "clue_3": {
+      "id": "clue_3",
+      "name": "Bone broth",
+      "description": "JPhilli was missing his homemade bone broth stew. So, taking ramen from the train and a bone he found, he combined them for a stew.",
+      "hint": "JPhilli loves to eat food, especially stew.",
+      "conversation_lead": "JPhilli misses home, especially his moms cooking. Steer towards asking him about family and food.",
+      "dependencies": ["clue_2"]
+    }
+  },
+  "npcs": [
+    {
+      "character_id": "robot",
+      "position": [22, 2],
+      "clue_id": "clue_1"
+    },
+    {
+      "character_id": "monster",
+      "position": [15, 2],
+      "clue_id": null
+    },
+    {
+      "character_id": "teengirl",
+      "position": [10, 5],
+      "clue_id": "clue_2"
+    },
+    {
+      "character_id": "nervous",
+      "position": [12, 2],
+      "clue_id": null
+    }, 
+    {
+      "character_id": "bug",
+      "position": [26, 4],
+      "clue_id": null
+    },
+    {
+      "character_id": "mort",
+      "position": [4, 8],
+      "clue_id": null
+    },
+        {
+      "character_id": "JPhilli",
+      "position": [9, 8],
+      "clue_id": "clue_3"
+    }
+  ],
+  "player_start": [2, 5]
+}
