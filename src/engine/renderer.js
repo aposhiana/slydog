@@ -40,6 +40,7 @@ export class Renderer {
       nervous: new Image(),
       mort: new Image()
       bug: new Image(),
+      neighmys: new Image(),
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
     this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
@@ -48,6 +49,7 @@ export class Renderer {
     this.npcSprites.nervous.src = 'assets/sprites/nervous_sprite.png';
     this.npcSprites.mort.src = 'assets/sprites/mort.png';
     this.npcSprites.bug.src = 'assets/sprites/bug_sprite.png';
+    this.npcSprites.neighmys.src = 'assets/sprites/neighmys.png';
 
     // Load dog sprites
     this.dogSprites = {
