@@ -43,6 +43,7 @@ export class Renderer {
       corndog_man: new Image(),
       neighmys: new Image(),
       jeengus: new Image(),
+      aperturecore: new Image()
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
     this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
@@ -54,6 +55,7 @@ export class Renderer {
     this.npcSprites.corndog_man.src = 'assets/sprites/corndog_man.png';
     this.npcSprites.neighmys.src = 'assets/sprites/neighmys.png';
     this.npcSprites.jeengus.src = 'assets/sprites/jeengus_sprite.png';
+    this.npcSprites.aperturecore.src = 'assets/sprites/aperturecore_sprite.png';
 
     // Load dog sprites
     this.dogSprites = {
