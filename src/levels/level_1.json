@@ -88,6 +88,11 @@
       "character_id": "bug",
       "position": [3, 1],
       "clue_id": null
+    },
+    {
+      "character_id": "neighmys",
+      "position": [5, 1],
+      "clue_id": null
     }
   ],
   "player_start": [2, 5]
