@@ -221,6 +221,8 @@ document.addEventListener('keydown', (e) => {
         
         // Check for POLLO command (easter egg)
         if (message.toUpperCase() === 'POLLO') {
+          // Make this async to handle ChatGPT call
+          (async () => {
           console.log('🐔🐔🐔 POLLO COMMAND DETECTED! 🐔🐔🐔');
           console.log('🐔 Granting all clues for current level...');
           
@@ -235,24 +237,41 @@ document.addEventListener('keydown', (e) => {
             }
           }
           
-          // Show snide compliment
-          const snideCompliments = [
-            "Oh, how... *clears throat*... impressive of you to discover that little trick. I suppose even a broken clock is right twice a day.",
-            "Well, well, well... someone's been reading the developer notes, haven't they? How... resourceful of you.",
-            "My, my... what a... *sigh*... clever little workaround you've found. I'm sure the developers will be... thrilled.",
-            "Oh, how... *adjusts glasses*... delightfully predictable. I suppose shortcuts are the way of the world these days.",
-            "Well, isn't that... *rolls eyes*... just absolutely brilliant. I'm sure this will make for a... memorable experience."
-          ];
-          
-          const randomCompliment = snideCompliments[Math.floor(Math.random() * snideCompliments.length)];
-          dialogueSystem.continueDialogue(randomCompliment);
+          // Get snide compliment from ChatGPT in character
+          const npc = dialogueSystem.currentNPC;
+          if (npc) {
+            const snidePrompt = `The player just used a secret "POLLO" command that granted them all the clues for this level. Respond with a snide, sarcastic, and unsincere compliment about their "clever" discovery. Be passive-aggressive and condescending. Stay in character as ${npc.name}. Keep it brief (1-2 sentences).`;
+            
+            const { sendChat } = await import('./ai/openai_client.js');
+            try {
+              const response = await sendChat([
+                { role: "system", content: npc.getSystemPrompt() },
+                { role: "user", content: snidePrompt }
+              ]);
+              
+              if (response.content && response.content.trim()) {
+                console.log(`🐔 ChatGPT snide response: ${response.content}`);
+                dialogueSystem.continueDialogue(response.content);
+              } else {
+                // Fallback if ChatGPT doesn't respond
+                dialogueSystem.continueDialogue("Oh, how... *sigh*... resourceful of you to find that little trick.");
+              }
+            } catch (error) {
+              console.error('❌ Error getting snide response from ChatGPT:', error);
+              // Fallback if ChatGPT fails
+              dialogueSystem.continueDialogue("Oh, how... *sigh*... resourceful of you to find that little trick.");
+            }
+          } else {
+            // Fallback if no NPC
+            dialogueSystem.continueDialogue("Oh, how... *sigh*... resourceful of you to find that little trick.");
+          }
           
           // Check if level is now complete
           if (world.checkLevelComplete(GameState.ownedClues)) {
             console.log(`🏆 Level complete via POLLO command!`);
             GameState.shouldCheckVictoryOnDialogueEnd = true;
           }
-          
+          })(); // Execute the async function
           return; // Skip normal dialogue processing
         }
         
