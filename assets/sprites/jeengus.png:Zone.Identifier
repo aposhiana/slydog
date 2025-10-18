@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://cloudconvert.com/
+HostUrl=https://us-east.storage.cloudconvert.com/tasks/621f83ae-75d2-4e23-8ab4-e9bc479fa1f3/StupidLittleIdiot.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20251018%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20251018T014838Z&X-Amz-Expires=86400&X-Amz-Signature=339df6233de32587d90f9e76b68220e22adca3e386bb7c955418a77de7f4fb5c&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22StupidLittleIdiot.png%22&response-content-type=image%2Fpng&x-id=GetObject
