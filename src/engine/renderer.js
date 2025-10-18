@@ -50,6 +50,7 @@ export class Renderer {
       neighmys: new Image(),
       jeengus: new Image(),
       aperturecore: new Image(),
+      dorg: new Image(),
       marthastewert: new Image()
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';

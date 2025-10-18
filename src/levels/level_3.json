@@ -2,7 +2,7 @@
   "id": "level_3",
   "name": "Where da bone at",
   "description": "Our dog came onto the train with his prized bone. But after going to get it from it's hiding space, it dissapeared. Find who took the bone.",
-  "next_level": "level_666",
+  "next_level": "level_4",
   "tilemap": [
     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
     [1,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,2,2,0,0,1],

@@ -112,7 +112,7 @@ function createNPCs(npcData, npcCharacters) {
  */
 export async function getAvailableLevels() {
   // For now, return hardcoded list. In a real game, this could scan the directory
-  return ['level_1', 'level_2', 'level_666'];
+  return ['level_1', 'level_2', 'level_3', 'level_4'];
 }
 
 /**
