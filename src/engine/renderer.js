@@ -41,7 +41,8 @@ export class Renderer {
       mort: new Image(),
       bug: new Image(),
       corndog_man: new Image(),
-      neighmys: new Image()
+      neighmys: new Image(),
+      jeengus: new Image(),
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
     this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
@@ -52,6 +53,7 @@ export class Renderer {
     this.npcSprites.bug.src = 'assets/sprites/bug_sprite.png';
     this.npcSprites.corndog_man.src = 'assets/sprites/corndog_man.png';
     this.npcSprites.neighmys.src = 'assets/sprites/neighmys.png';
+    this.npcSprites.jeengus.src = 'assets/sprites/jeengus.png';
 
     // Load dog sprites
     this.dogSprites = {

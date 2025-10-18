@@ -41,6 +41,14 @@
       "hint": "Zorblax the Monster loves collecting space rocks and might know about stardust.",
       "conversation_lead": "Zorblax is fascinated by space materials and rocks. He might discuss stardust, space minerals, or unusual cosmic materials if asked about space rocks, cosmic phenomena, or rare materials. Guide conversations toward his knowledge of space materials.",
       "dependencies": ["clue_b"]
+    },
+    "clue_d": {
+      "id": "clue_d",
+      "name": "Forged Access Codes",
+      "description": "An access log shows a set of high-level codes used to override the cargo hold security — but the codes don't match any current crew or staff credentials. They've been forged.",
+      "hint": "Captain Elara keeps strict logs of crew access and might notice anomalies.",
+      "conversation_lead": "Captain Elara is meticulous about ship protocol and access permissions. If asked about security logs, unusual activity, or breaches in protocol, she might mention the forged access codes. Steer conversations toward official procedures, access logs, or anomalies in crew behavior.",
+      "dependencies": ["clue_c"]
     }
   },
   "npcs": [
@@ -93,6 +101,11 @@
       "character_id": "neighmys",
       "position": [5, 1],
       "clue_id": null
+    },
+    {
+      "character_id": "jeengus",
+      "position": [15, 8],
+      "clue_id": "clue_d"
     }
   ],
   "player_start": [2, 5]
