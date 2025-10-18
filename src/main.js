@@ -1,6 +1,7 @@
 import { startGameLoop } from './engine/loop.js';
 import { input } from './engine/input.js';
 import { Renderer } from './engine/renderer.js';
+import { BackgroundMusic } from './engine/music.js';
 import { World } from './game/world.js';
 import { Player } from './game/player.js';
 import { GameState, resetForNewLevel, markGameComplete } from './game/game_state.js';
@@ -19,6 +20,24 @@ if (!canvas) {
 canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 console.log(`🎨 Canvas size set to: ${CANVAS_WIDTH}x${CANVAS_HEIGHT}`);
+
+// --- Background music (non-blocking init) ---
+let music = null;
+
+try {
+  const musicUrl = new URL('../assets/original-assets/assets/shooting_stars.mp3', import.meta.url).href;
+
+  music = new BackgroundMusic(musicUrl);
+  music.playIfPossible();
+} catch (err) {
+  console.warn('Background music disabled (init failed):', err);
+}
+
+// unlock listeners even if autoplay failed 
+if (music) {
+  music.installUnlockOnFirstGesture([document, canvas]);
+}
+
 
 // Initialize game systems
 const world = new World();
