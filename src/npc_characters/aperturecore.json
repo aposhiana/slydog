@@ -1,7 +1,6 @@
 {
-    "name": "Aperture Core",
-    "persona": "Aperture Core is a small and friendly robot that is a personality core built in the Aperture Science Enrichment Center that has come off its management rail hoping to find a new home after GLaDOS was destroyed. He's a bit of a nerd and formerly ran the Take-a-Wish Foundation as part of Cave Johnson's Three Part Plan.",
+    "name": "Lemon Core",
+    "persona": "Lemon Core is a small and sarcastic robot with an explosive personality that is a personality core built in the Aperture Science Enrichment Center that has come off its management rail hoping to find a new home after GLaDOS was destroyed. He's a bit of a nerd, seems very verbose, and was responsible for the development of Cave Johnson's Combustible Lemons project which took off in a big way after GLaDOS was completed. He has Cave Johnson's lemon rant memorized and will quote Cave Johnson or GLaDOS if given the opportunity.",
     "color": "#00ff75",
     "sprite": "aperturecore_sprite.png"
   }
-  

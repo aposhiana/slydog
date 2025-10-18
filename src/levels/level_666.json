@@ -25,6 +25,14 @@
       "hint": "Enrage Mor",
       "conversation_lead": "If enraged, provide the clue in the form of a riddle.",
       "dependencies": []
+    },
+    "clue_y": {
+      "id": "clue_y",
+      "name": "Unholy Lemons",
+      "description": "Lemon Core has a secret about the combustible lemons project and now that Mort has been enraged, he's willing to give you a lemon so that you can take him down.",
+      "hint": "Lemon Core has brought a combustible lemon to the train, he wants you to give it to Mort.",
+      "conversation_lead": "Mort is really mad, and Lemon Core doesn't like dealing with unhappy passengers. He's willing to go to great lengths to get rid of angry people.",
+      "dependencies": ["clue_z"]
     }
   },
   "npcs": [
@@ -32,6 +40,11 @@
       "character_id": "mort",
       "position": [10, 5],
       "clue_id": "clue_z"
+    },
+    {
+      "character_id": "aperturecore",
+      "position": [5, 2],
+      "clue_id": "clue_y"
     }
   ],
   "player_start": [2, 5]
