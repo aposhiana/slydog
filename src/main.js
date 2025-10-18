@@ -219,6 +219,43 @@ document.addEventListener('keydown', (e) => {
         textInputBuffer = '';
         dialogueSystem.hideInput();
         
+        // Check for POLLO command (easter egg)
+        if (message.toUpperCase() === 'POLLO') {
+          console.log('🐔🐔🐔 POLLO COMMAND DETECTED! 🐔🐔🐔');
+          console.log('🐔 Granting all clues for current level...');
+          
+          // Grant all clues for the current level
+          const allClues = world.getClues();
+          const levelClues = Object.keys(allClues);
+          
+          for (const clueId of levelClues) {
+            if (!GameState.ownedClues.has(clueId)) {
+              GameState.grantClue(clueId, 'POLLO command used');
+              console.log(`🎯 Granted clue: ${clueId}`);
+            }
+          }
+          
+          // Show snide compliment
+          const snideCompliments = [
+            "Oh, how... *clears throat*... impressive of you to discover that little trick. I suppose even a broken clock is right twice a day.",
+            "Well, well, well... someone's been reading the developer notes, haven't they? How... resourceful of you.",
+            "My, my... what a... *sigh*... clever little workaround you've found. I'm sure the developers will be... thrilled.",
+            "Oh, how... *adjusts glasses*... delightfully predictable. I suppose shortcuts are the way of the world these days.",
+            "Well, isn't that... *rolls eyes*... just absolutely brilliant. I'm sure this will make for a... memorable experience."
+          ];
+          
+          const randomCompliment = snideCompliments[Math.floor(Math.random() * snideCompliments.length)];
+          dialogueSystem.continueDialogue(randomCompliment);
+          
+          // Check if level is now complete
+          if (world.checkLevelComplete(GameState.ownedClues)) {
+            console.log(`🏆 Level complete via POLLO command!`);
+            GameState.shouldCheckVictoryOnDialogueEnd = true;
+          }
+          
+          return; // Skip normal dialogue processing
+        }
+        
         // Submit the text and get response
         if (dialogueSystem.currentNPC) {
           const npc = dialogueSystem.currentNPC;
