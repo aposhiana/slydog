@@ -62,6 +62,7 @@ export class Renderer {
     this.npcSprites.neighmys.src = 'assets/sprites/neighmys.png';
     this.npcSprites.jeengus.src = 'assets/sprites/jeengus_sprite.png';
     this.npcSprites.aperturecore.src = 'assets/sprites/aperturecore_sprite.png';
+    this.npcSprites.dorg.src = 'assets/sprites/dorg.png';
 
     // Load dog sprites
     this.dogSprites = {
