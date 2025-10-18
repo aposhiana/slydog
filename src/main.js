@@ -310,15 +310,10 @@ function update(dt) {
     // Handle movement input - check for newly pressed keys
     let dx = 0, dy = 0;
     
-    if (input.isKeyPressed('KeyW') || input.isKeyPressed('ArrowUp')) {
-      dy = -1;
-    } else if (input.isKeyPressed('KeyS') || input.isKeyPressed('ArrowDown')) {
-      dy = 1;
-    } else if (input.isKeyPressed('KeyA') || input.isKeyPressed('ArrowLeft')) {
-      dx = -1;
-    } else if (input.isKeyPressed('KeyD') || input.isKeyPressed('ArrowRight')) {
-      dx = 1;
-    }
+    const { dx: stepDx, dy: stepDy } = input.getMovementRepeatStep();
+
+    dx = stepDx;
+    dy = stepDy;
     
     if (dx !== 0 || dy !== 0) {
       player.tryMove(dx, dy, world);
