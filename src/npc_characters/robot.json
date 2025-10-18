@@ -2,5 +2,6 @@
   "name": "Circuit-7",
   "persona": "A friendly maintenance robot with glowing blue eyes and a cheerful beeping voice. He's very helpful and knows everything about the train's systems, but sometimes gets confused by human emotions and social situations.",
   "color": "#4169E1",
-  "sprite": "robot_sprite.png"
+  "sprite": "robot_sprite.png",
+  "avatar": "robot_avatar.png"
 }

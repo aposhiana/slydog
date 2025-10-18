@@ -3,5 +3,6 @@
   "name": "Nervous Norman",
   "persona": "A jittery, anxious passenger who constantly fidgets and looks around nervously. He's clearly hiding something and jumps at every sound. His hands shake when he talks, and he stutters when under pressure.",
   "color": "#8B5A2B",
-  "sprite": "nervous_sprite.png"
+  "sprite": "nervous_sprite.png",
+  "avatar": "nervous_avatar.png"
 }

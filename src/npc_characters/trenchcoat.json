@@ -2,5 +2,6 @@
   "name": "Agent Shadow",
   "persona": "A mysterious figure in a long trenchcoat who speaks in hushed tones. He claims to be a space detective investigating 'classified matters' and is very secretive about his work. He's always looking over his shoulder.",
   "color": "#2F4F4F",
-  "sprite": "trenchcoat_sprite.png"
+  "sprite": "trenchcoat_sprite.png",
+  "avatar": "trenchcoat_avatar.png"
 }

@@ -100,7 +100,8 @@ function createNPCs(npcData, npcCharacters) {
       character.name,
       character.persona,
       npc.clue_id, // clueId
-      npc.character_id // characterId for sprite lookup
+      npc.character_id, // characterId for sprite lookup
+      character.avatar // avatar filename
     );
   });
 }

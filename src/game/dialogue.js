@@ -6,6 +6,9 @@ export class DialogueSystem {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     
+    // Load avatar images
+    this.avatarImages = {};
+    this.loadAvatars();
     
     // Dialogue panel dimensions
     this.panelHeight = 200; // Even taller for long responses
@@ -13,6 +16,10 @@ export class DialogueSystem {
     this.margin = 20;
     this.textY = this.panelY + 30;
     this.lineHeight = 16; // Slightly smaller line height to fit more text
+    
+    // Avatar dimensions
+    this.avatarSize = 120;
+    this.avatarMargin = 15;
     
     // Dialogue state
     this.isActive = false;
@@ -33,6 +40,23 @@ export class DialogueSystem {
     // Scrolling state
     this.scrollOffset = 0;
     this.maxScrollOffset = 0;
+  }
+
+  // Load avatar images
+  loadAvatars() {
+    const avatarFiles = [
+      'girl_avatar.png',
+      'moster_avatar.png', 
+      'trenchcoat_avatar.png',
+      'robot_avatar.png',
+      'nervous_avatar.png'
+    ];
+    
+    avatarFiles.forEach(filename => {
+      const img = new Image();
+      img.src = `assets/avatars/${filename}`;
+      this.avatarImages[filename] = img;
+    });
   }
 
   // Start dialogue with an NPC
@@ -174,9 +198,16 @@ export class DialogueSystem {
       this.panelY + 20
     );
 
+    // Draw avatar if available
+    this.renderAvatar();
+
     // Draw dialogue text with typewriter effect or waiting message
     this.ctx.fillStyle = '#ffffff';
     this.ctx.font = '14px monospace';
+    
+    // Adjust text area if avatar is present
+    const hasAvatar = this.currentNPC && this.currentNPC.avatar && this.avatarImages[this.currentNPC.avatar];
+    const textAreaWidth = hasAvatar ? CANVAS_WIDTH - this.avatarSize - this.avatarMargin * 3 : CANVAS_WIDTH - this.margin * 2;
     
     if (this.isWaitingForResponse) {
       // Show waiting message instead of replaying text
@@ -188,7 +219,7 @@ export class DialogueSystem {
       // For short text, don't apply scroll offset - start at textY
       // For long text, apply scroll offset to move content up
       const startY = this.maxScrollOffset > 0 ? this.textY - this.scrollOffset : this.textY;
-      this.calculateAndDrawText(displayText, this.margin, startY, CANVAS_WIDTH - this.margin * 2);
+      this.calculateAndDrawText(displayText, this.margin, startY, textAreaWidth);
     }
 
     // Draw input field if ready - position it at the bottom of the panel
@@ -285,5 +316,56 @@ export class DialogueSystem {
   // Check if input is being shown
   isInputActive() {
     return this.showInput;
+  }
+
+  // Render avatar on the right side of the dialogue panel
+  renderAvatar() {
+    if (!this.currentNPC || !this.currentNPC.avatar) return;
+    
+    const avatarImage = this.avatarImages[this.currentNPC.avatar];
+    if (!avatarImage || !avatarImage.complete || avatarImage.naturalWidth === 0) return;
+    
+    // Calculate avatar position (right side of panel)
+    const avatarX = CANVAS_WIDTH - this.avatarSize - this.avatarMargin;
+    const avatarY = this.panelY + this.avatarMargin;
+    
+    // Draw avatar background circle
+    this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+    this.ctx.beginPath();
+    this.ctx.arc(
+      avatarX + this.avatarSize / 2,
+      avatarY + this.avatarSize / 2,
+      this.avatarSize / 2 + 5,
+      0,
+      Math.PI * 2
+    );
+    this.ctx.fill();
+    
+    // Draw avatar border
+    this.ctx.strokeStyle = this.currentNPC.color;
+    this.ctx.lineWidth = 3;
+    this.ctx.stroke();
+    
+    // Draw avatar image
+    this.ctx.save();
+    this.ctx.beginPath();
+    this.ctx.arc(
+      avatarX + this.avatarSize / 2,
+      avatarY + this.avatarSize / 2,
+      this.avatarSize / 2,
+      0,
+      Math.PI * 2
+    );
+    this.ctx.clip();
+    
+    this.ctx.drawImage(
+      avatarImage,
+      avatarX,
+      avatarY,
+      this.avatarSize,
+      this.avatarSize
+    );
+    
+    this.ctx.restore();
   }
 }
