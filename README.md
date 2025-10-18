@@ -23,7 +23,8 @@ Characters live in `src/npc_characters/`. Create a new file like `src/npc_charac
   "name": "Inspector Gray",
   "color": "#555555",
   "persona": "a meticulous investigator who speaks succinctly",
-  "sprite": "inspector_sprite.png"
+  "sprite": "inspector_sprite.png",
+  "avatar": "inspector_avatar.png"
 }
 ```
 
@@ -32,10 +33,15 @@ Characters live in `src/npc_characters/`. Create a new file like `src/npc_charac
 - `color`: Hex color for fallback rendering (when sprite isn't loaded)
 - `persona`: Guides the NPC's tone and behavior in the system prompt
 - `sprite`: Filename of the sprite image (must be in `assets/sprites/`)
+- `avatar`: Filename of the avatar image for dialogue (must be in `assets/avatars/`)
 
 **Adding the sprite asset:**
 1. Add your sprite image to `assets/sprites/` (e.g., `inspector_sprite.png`)
 2. Update the renderer to load your sprite by adding it to the `npcSprites` object in `src/engine/renderer.js`:
+
+**Adding the avatar asset:**
+1. Add your avatar image to `assets/avatars/` (e.g., `inspector_avatar.png`)
+2. Update the dialogue system to load your avatar by adding it to the `avatarFiles` array in `src/game/dialogue.js`:
 
 ```javascript
 // In the constructor, add to npcSprites object:
@@ -50,6 +56,20 @@ this.npcSprites = {
 
 // Set the sprite source:
 this.npcSprites.inspector.src = 'assets/sprites/inspector_sprite.png';
+```
+
+**For avatars, update the dialogue system:**
+
+```javascript
+// In src/game/dialogue.js, add to the avatarFiles array in loadAvatars():
+const avatarFiles = [
+  'girl_avatar.png',
+  'moster_avatar.png', 
+  'trenchcoat_avatar.png',
+  'robot_avatar.png',
+  'nervous_avatar.png',
+  'inspector_avatar.png'  // Add your new avatar
+];
 ```
 
 Use the `character_id` to reference this file from your level's `npcs` array (e.g., `"character_id": "inspector"` for `inspector.json`).
@@ -77,7 +97,33 @@ Use the `character_id` to reference this file from your level's `npcs` array (e.
 **Fallback Rendering:**
 If a sprite fails to load, the game will display a colored rectangle using the character's `color` field as a fallback.
 
-### 1.2) Updating the Renderer for New Sprites
+### 1.2) Managing Avatar Assets
+
+**Avatar Organization:**
+- All character avatars go in `assets/avatars/`
+- Avatar files should be PNG format for transparency support
+- Recommended naming: `{character_id}_avatar.png` (e.g., `inspector_avatar.png`)
+
+**Avatar Requirements:**
+- **Size**: Avatars are displayed at 120x120 pixels in a circular frame
+- **Aspect Ratio**: Square images work best (will be cropped to circle)
+- **Transparency**: Use PNG with transparent background for clean integration
+- **Style**: Match the existing character art style for consistency
+
+**Current Available Avatars:**
+- `girl_avatar.png` - Luna Stardust
+- `moster_avatar.png` - Zorblax the Monster
+- `trenchcoat_avatar.png` - Agent Shadow
+- `robot_avatar.png` - Circuit-7
+- `nervous_avatar.png` - Nervous Norman
+- `neighmys_avatar.png` - Neighmys
+
+**Avatar Display:**
+- Avatars appear on the right side of the dialogue panel
+- Only characters with an `avatar` field will show an avatar
+- If an avatar fails to load, no avatar will be displayed (no fallback)
+
+### 1.3) Updating the Renderer for New Sprites
 
 When adding a new character with a sprite, you need to update the renderer to load the sprite:
 
@@ -110,8 +156,10 @@ this.npcSprites.your_new_character.src = 'assets/sprites/your_new_character_spri
 **Important Notes:**
 - The `character_id` in your character JSON must match the key in `npcSprites`
 - The sprite filename in the character JSON must match the actual file in `assets/sprites/`
+- The avatar filename in the character JSON must match the actual file in `assets/avatars/`
 - The renderer automatically handles scaling and positioning - no additional code needed
 - Sprites are loaded asynchronously, so there may be a brief fallback display while loading
+- Avatars are loaded asynchronously, so there may be a brief delay before they appear in dialogue
 
 ### 2) Create a new level
 
