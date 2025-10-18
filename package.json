@@ -7,8 +7,21 @@
     "serve": "npx http-server -c-1 -p 8080 --no-cors --no-dotfiles --no-etag .",
     "dev": "npx http-server -c-1 -p 8080 --no-cors --no-dotfiles --no-etag ."
   },
-  "keywords": ["game", "mystery", "canvas", "ai"],
+  "keywords": [
+    "game",
+    "mystery",
+    "canvas",
+    "ai"
+  ],
   "author": "",
   "license": "MIT",
-  "type": "module"
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aposhiana/slydog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aposhiana/slydog/issues"
+  },
+  "homepage": "https://github.com/aposhiana/slydog#readme"
 }

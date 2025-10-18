@@ -40,6 +40,7 @@ export class Renderer {
       nervous: new Image(),
       mort: new Image(),
       bug: new Image(),
+      corndog_man: new Image(),
       neighmys: new Image(),
       jeengus: new Image(),
     };
@@ -50,6 +51,7 @@ export class Renderer {
     this.npcSprites.nervous.src = 'assets/sprites/nervous_sprite.png';
     this.npcSprites.mort.src = 'assets/sprites/mort.png';
     this.npcSprites.bug.src = 'assets/sprites/bug_sprite.png';
+    this.npcSprites.corndog_man.src = 'assets/sprites/corndog_man.png';
     this.npcSprites.neighmys.src = 'assets/sprites/neighmys.png';
     this.npcSprites.jeengus.src = 'assets/sprites/jeengus.png';
 

@@ -63,7 +63,7 @@
       "clue_id": "clue_b"
     },
     {
-      "character_id": "monster",
+      "character_id": "corndog_man",
       "position": [25, 2],
       "clue_id": "clue_c"
     },
@@ -83,7 +83,7 @@
       "clue_id": null
     },
     {
-      "character_id": "monster",
+      "character_id": "corndog_man",
       "position": [22, 5],
       "clue_id": null
     },
