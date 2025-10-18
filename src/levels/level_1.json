@@ -106,6 +106,11 @@
       "character_id": "jeengus",
       "position": [15, 8],
       "clue_id": "clue_d"
+    },
+    {
+      "character_id": "marthastewert",
+      "position": [8, 3],
+      "clue_id": null
     }
   ],
   "player_start": [2, 5]

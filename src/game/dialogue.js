@@ -51,7 +51,8 @@ export class DialogueSystem {
       'robot_avatar.png',
       'nervous_avatar.png',
       'neighmys_avatar.png',
-      'corndog_man_avatar.png'
+      'corndog_man_avatar.png',
+      'marthastewart.png'
     ];
     
     avatarFiles.forEach(filename => {
