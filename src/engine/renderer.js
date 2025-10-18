@@ -38,9 +38,9 @@ export class Renderer {
       trenchcoat: new Image(),
       robot: new Image(),
       nervous: new Image(),
-      mort: new Image()
+      mort: new Image(),
       bug: new Image(),
-      neighmys: new Image(),
+      neighmys: new Image()
     };
     this.npcSprites.monster.src = 'assets/sprites/monster_sprite.png';
     this.npcSprites.girl.src = 'assets/sprites/girl_sprite.png';
