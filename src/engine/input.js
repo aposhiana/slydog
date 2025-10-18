@@ -122,7 +122,6 @@ class InputManager {
     return { dx, dy };
   }
 
-    // New: Discrete step output with key-repeat while held.
   // Call this each frame; it returns {dx, dy} when it’s time to move one tile, else {0,0}.
   getMovementRepeatStep(now = performance.now()) {
     const intended = this._getHeldDirection();
